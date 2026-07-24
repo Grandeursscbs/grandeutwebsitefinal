@@ -2236,25 +2236,32 @@ document.addEventListener('DOMContentLoaded', () => {
         return events;
     }
 
-    const btnSaveAllEvents = document.getElementById('btn-save-all-events');
-    if (btnSaveAllEvents) {
-        btnSaveAllEvents.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const updatedEvents = readEventsFromDOM();
-            showToast('⏳ Saving events changes...');
+    async function saveEventsHandler(e) {
+        if (e) e.preventDefault();
+        const updatedEvents = readEventsFromDOM();
+        showToast('⏳ Saving events changes...');
 
-            let success = false;
-            if (window.GrandeurDB && window.GrandeurDB.updateEvents) {
-                success = await window.GrandeurDB.updateEvents(updatedEvents);
-            }
+        let success = false;
+        if (window.GrandeurDB && window.GrandeurDB.updateEvents) {
+            success = await window.GrandeurDB.updateEvents(updatedEvents);
+        }
 
-            if (success) {
-                showToast('✅ All 3 events updated successfully!');
-            } else {
-                showToast('❌ Error saving events. Please check network.');
-            }
-        });
+        if (success) {
+            showToast('✅ All 3 events updated successfully!');
+        } else {
+            showToast('❌ Error saving events. Please check network.');
+        }
     }
+
+    const formEventsManager = document.getElementById('form-events-manager');
+    if (formEventsManager) {
+        formEventsManager.addEventListener('submit', saveEventsHandler);
+    }
+
+    const allSaveEventBtns = document.querySelectorAll('#btn-save-all-events, .btn-save-events');
+    allSaveEventBtns.forEach(btn => {
+        btn.addEventListener('click', saveEventsHandler);
+    });
 
     checkAuthSession();
 });
