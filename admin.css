@@ -1040,3 +1040,46 @@ input:checked + .slider:before {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
 }
+
+/* EVENTS EDITOR STYLES */
+.event-subtab-btn.active {
+    background: var(--admin-gold) !important;
+    color: #0f172a !important;
+    border-color: var(--admin-gold) !important;
+    font-weight: 700 !important;
+    text-shadow: none !important;
+}
+
+.event-slide-item-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--admin-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    position: relative;
+    transition: border-color 0.2s ease;
+}
+
+.event-slide-item-card:hover {
+    border-color: rgba(212, 175, 55, 0.4);
+}
+
+.event-slide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.event-slide-number {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--admin-gold);
+}
+
+.event-slide-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+

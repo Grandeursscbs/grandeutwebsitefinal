@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let cachedTeam = [];
     let cachedPrimers = [];
     let cachedAlumni = [];
+    let cachedEvents = [];
 
     function getSupabase() {
         if (window.supabaseClient) return window.supabaseClient;
@@ -370,6 +371,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 cachedAchievements = await window.GrandeurDB.getAchievements();
                 if (window.GrandeurDB.getLiveProjects) {
                     cachedLiveProjects = await window.GrandeurDB.getLiveProjects();
+                }
+                if (window.GrandeurDB.getEvents) {
+                    cachedEvents = await window.GrandeurDB.getEvents();
+                    renderEventsEditor(cachedEvents);
                 }
             } catch (err) {
                 console.warn("GrandeurDB fetch warning:", err);
@@ -2025,6 +2030,230 @@ document.addEventListener('DOMContentLoaded', () => {
             toast.style.opacity = '0';
             setTimeout(() => toast.remove(), 300);
         }, 3500);
+    }
+
+    // ----------------------------------------------------------------------
+    // EVENTS (WHAT WE DO) MANAGEMENT ENGINE
+    // ----------------------------------------------------------------------
+
+    const eventSubtabBtns = document.querySelectorAll('.event-subtab-btn');
+    const eventEditorCards = document.querySelectorAll('.event-editor-card');
+
+    eventSubtabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const evId = btn.getAttribute('data-event');
+            eventSubtabBtns.forEach(b => b.classList.remove('active'));
+            eventEditorCards.forEach(card => card.style.display = 'none');
+
+            btn.classList.add('active');
+            const targetCard = document.getElementById(`event-editor-${evId}`);
+            if (targetCard) targetCard.style.display = 'block';
+        });
+    });
+
+    function renderEventsEditor(events) {
+        if (!Array.isArray(events) || events.length === 0) return;
+        cachedEvents = events;
+
+        ['invicta', 'echelon', 'ranneeti'].forEach(evId => {
+            const evData = events.find(e => e.id === evId) || {
+                id: evId,
+                title: evId.toUpperCase(),
+                tagline: '',
+                description: '',
+                slides: []
+            };
+
+            const inputTagline = document.getElementById(`event-${evId}-tagline`);
+            const inputTitle = document.getElementById(`event-${evId}-title`);
+            const inputDesc = document.getElementById(`event-${evId}-desc`);
+
+            if (inputTagline) inputTagline.value = evData.tagline || '';
+            if (inputTitle) inputTitle.value = evData.title || '';
+            if (inputDesc) inputDesc.value = evData.description || '';
+
+            renderEventSlidesList(evId, evData.slides || []);
+        });
+    }
+
+    function renderEventSlidesList(evId, slides) {
+        const container = document.getElementById(`slides-list-${evId}`);
+        if (!container) return;
+
+        if (!Array.isArray(slides) || slides.length === 0) {
+            container.innerHTML = `<p style="color:var(--admin-text-muted); font-size:0.88rem; font-style:italic;">No slides added yet. Click "+ Add New Slide" above to add one.</p>`;
+            return;
+        }
+
+        container.innerHTML = slides.map((slide, sIdx) => `
+            <div class="event-slide-item-card" data-event="${evId}" data-slide-index="${sIdx}">
+                <div class="event-slide-header">
+                    <span class="event-slide-number">Slide #${sIdx + 1}</span>
+                    <div class="event-slide-actions">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="moveEventSlide('${evId}', ${sIdx}, -1)" title="Move Slide Up" ${sIdx === 0 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''}>▲ Up</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="moveEventSlide('${evId}', ${sIdx}, 1)" title="Move Slide Down" ${sIdx === slides.length - 1 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''}>▼ Down</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="deleteEventSlide('${evId}', ${sIdx})" style="border-color:var(--admin-danger) !important; color:var(--admin-danger) !important;">🗑️ Remove</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-2" style="gap:1rem; margin-bottom:0.75rem;">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label style="font-size:0.83rem; color:var(--admin-text-muted);">Top Badge Text</label>
+                        <input type="text" class="form-input slide-input-badge" value="${escapeHtml(slide.badge || '')}" placeholder="e.g. Annual Flagship Event">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label style="font-size:0.83rem; color:var(--admin-text-muted);">Slide Overlay Main Heading</label>
+                        <input type="text" class="form-input slide-input-title" value="${escapeHtml(slide.title || '')}" placeholder="e.g. INVICTA '26 or Cash Prizes & Goodies">
+                    </div>
+                </div>
+
+                <div class="grid grid-2" style="gap:1rem; margin-bottom:0.75rem;">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label style="font-size:0.83rem; color:var(--admin-text-muted);">Slide Overlay Subheading / Subtitle</label>
+                        <input type="text" class="form-input slide-input-sub" value="${escapeHtml(slide.sub || '')}" placeholder="e.g. National Case Competition or Evaluated by Industry Experts">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label style="font-size:0.83rem; color:var(--admin-text-muted);">Slide Image Source / Upload</label>
+                        <div style="display:flex; align-items:center; gap:0.75rem;">
+                            <input type="file" class="form-input slide-file-input" accept="image/*" onchange="handleSlideImageUpload(this, '${evId}', ${sIdx})" style="padding:0.3rem; flex:1;">
+                            <div class="slide-img-preview" style="width:48px; height:48px; border-radius:8px; border:1px dashed var(--admin-gold); overflow:hidden; background:#0f172a; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+                                ${slide.image ? `<img src="${escapeHtml(slide.image)}" style="width:100%; height:100%; object-fit:cover;">` : `<span style="font-size:1.1rem; opacity:0.6;">🖼️</span>`}
+                            </div>
+                        </div>
+                        <input type="hidden" class="slide-input-image" value="${escapeHtml(slide.image || '')}">
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    window.handleSlideImageUpload = function(inputEl, evId, sIdx) {
+        const file = inputEl.files && inputEl.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const dataUrl = e.target.result;
+            const card = inputEl.closest('.event-slide-item-card');
+            if (card) {
+                const imgInput = card.querySelector('.slide-input-image');
+                const previewBox = card.querySelector('.slide-img-preview');
+                if (imgInput) imgInput.value = dataUrl;
+                if (previewBox) {
+                    previewBox.innerHTML = `<img src="${dataUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+                }
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    window.moveEventSlide = function(evId, sIdx, direction) {
+        readEventsFromDOM();
+        const evData = cachedEvents.find(e => e.id === evId);
+        if (!evData || !evData.slides) return;
+
+        const targetIdx = sIdx + direction;
+        if (targetIdx < 0 || targetIdx >= evData.slides.length) return;
+
+        const temp = evData.slides[sIdx];
+        evData.slides[sIdx] = evData.slides[targetIdx];
+        evData.slides[targetIdx] = temp;
+
+        renderEventSlidesList(evId, evData.slides);
+    };
+
+    window.deleteEventSlide = function(evId, sIdx) {
+        readEventsFromDOM();
+        const evData = cachedEvents.find(e => e.id === evId);
+        if (!evData || !evData.slides) return;
+
+        if (confirm(`Delete slide #${sIdx + 1}?`)) {
+            evData.slides.splice(sIdx, 1);
+            renderEventSlidesList(evId, evData.slides);
+        }
+    };
+
+    const addSlideButtons = document.querySelectorAll('.btn-add-event-slide');
+    addSlideButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const evId = btn.getAttribute('data-event');
+            readEventsFromDOM();
+            let evData = cachedEvents.find(e => e.id === evId);
+            if (!evData) {
+                evData = { id: evId, title: evId.toUpperCase(), tagline: '', description: '', slides: [] };
+                cachedEvents.push(evData);
+            }
+            if (!Array.isArray(evData.slides)) evData.slides = [];
+
+            evData.slides.push({
+                image: '',
+                badge: 'Flagship Event',
+                title: 'New Slide Title',
+                sub: 'Slide Detail Text'
+            });
+
+            renderEventSlidesList(evId, evData.slides);
+        });
+    });
+
+    function readEventsFromDOM() {
+        const events = ['invicta', 'echelon', 'ranneeti'].map(evId => {
+            const tagline = document.getElementById(`event-${evId}-tagline`)?.value || '';
+            const title = document.getElementById(`event-${evId}-title`)?.value || '';
+            const description = document.getElementById(`event-${evId}-desc`)?.value || '';
+
+            const slideCards = document.querySelectorAll(`#slides-list-${evId} .event-slide-item-card`);
+            const slides = [];
+
+            slideCards.forEach(card => {
+                const badge = card.querySelector('.slide-input-badge')?.value || '';
+                const slideTitle = card.querySelector('.slide-input-title')?.value || '';
+                const slideSub = card.querySelector('.slide-input-sub')?.value || '';
+                const image = card.querySelector('.slide-input-image')?.value || '';
+
+                const origEv = cachedEvents.find(e => e.id === evId);
+                const origSlide = origEv?.slides ? origEv.slides[parseInt(card.getAttribute('data-slide-index') || '0', 10)] : null;
+
+                slides.push({
+                    image: image,
+                    gradient: origSlide?.gradient || (image ? '' : `gradient-${evId}-1`),
+                    badge: badge,
+                    title: slideTitle,
+                    sub: slideSub
+                });
+            });
+
+            return {
+                id: evId,
+                title: title,
+                tagline: tagline,
+                description: description,
+                slides: slides
+            };
+        });
+
+        cachedEvents = events;
+        return events;
+    }
+
+    const btnSaveAllEvents = document.getElementById('btn-save-all-events');
+    if (btnSaveAllEvents) {
+        btnSaveAllEvents.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const updatedEvents = readEventsFromDOM();
+            showToast('⏳ Saving events changes...');
+
+            let success = false;
+            if (window.GrandeurDB && window.GrandeurDB.updateEvents) {
+                success = await window.GrandeurDB.updateEvents(updatedEvents);
+            }
+
+            if (success) {
+                showToast('✅ All 3 events updated successfully!');
+            } else {
+                showToast('❌ Error saving events. Please check network.');
+            }
+        });
     }
 
     checkAuthSession();

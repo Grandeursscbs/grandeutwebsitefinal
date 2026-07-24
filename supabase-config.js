@@ -446,8 +446,106 @@ window.GrandeurDB = {
 
         window.GrandeurDB.clearCache();
         return success;
+    },
+
+    // 10. EVENTS (WHAT WE DO) CRUD & FALLBACK ENGINE
+    async getEvents() {
+        const cached = getSessionCachedData('events');
+        if (cached && Array.isArray(cached) && cached.length > 0) return cached;
+        
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=events_data&id=eq.1`, { headers: READ_HEADERS });
+            if (res.ok) {
+                const rows = await res.json();
+                if (rows && rows.length > 0 && rows[0].events_data) {
+                    const data = typeof rows[0].events_data === 'string' ? JSON.parse(rows[0].events_data) : rows[0].events_data;
+                    if (Array.isArray(data) && data.length > 0) {
+                        setSessionCachedData('events', data);
+                        try { localStorage.setItem('gdb_fallback_events', JSON.stringify(data)); } catch(e) {}
+                        return data;
+                    }
+                }
+            }
+        } catch(e) {}
+
+        // Fallback to Local Storage
+        try {
+            const local = localStorage.getItem('gdb_fallback_events');
+            if (local) {
+                const parsed = JSON.parse(local);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch(e) {}
+
+        // Fallback to DEFAULT_EVENTS
+        const DEFAULT_EVENTS = [
+            {
+                id: 'invicta',
+                title: 'INVICTA',
+                tagline: 'Flagship Case Competition',
+                description: "Grandeur's premier national case study competition bringing together sharp business minds from across top universities to solve complex corporate and strategic challenges.",
+                slides: [
+                    { image: 'invicta-1.jpg', badge: 'Annual Flagship Event', title: "INVICTA '26", sub: 'National Case Competition' },
+                    { image: 'invicta-2.jpg', badge: 'Annual Flagship Event', title: '1,500+ Participants', sub: 'Top B-Schools & DU Circuit' },
+                    { image: 'invicta-1.jpg', badge: 'Annual Flagship Event', title: 'Cash Prizes & Goodies', sub: 'Evaluated by Industry Experts' }
+                ]
+            },
+            {
+                id: 'echelon',
+                title: 'Echelon',
+                tagline: 'The Simulation Challenge',
+                description: 'An annual summit featuring keynote addresses from partner consultants, interactive strategy workshops, and high-impact corporate networking for aspiring business strategists.',
+                slides: [
+                    { image: 'echelon-1.jpg', badge: 'Crescendo Event', title: 'ECHELON', sub: 'Strategic Leadership Convention' },
+                    { image: 'echelon-2.jpg', badge: 'Crescendo Event', title: 'Industry Stalwarts', sub: 'Leaders from MBB & Big4' },
+                    { image: 'echelon-1.jpg', badge: 'Crescendo Event', title: 'Executive Mixers', sub: 'Connect with Industry Mentors' }
+                ]
+            },
+            {
+                id: 'ranneeti',
+                title: 'Ranneeti',
+                tagline: 'Intra-College Direct PI Competition',
+                description: 'The premier strategy battleground designed to hone analytical thinking, GTM formulation, and presentation skills through live corporate case simulations and peer challenges.',
+                slides: [
+                    { image: '', gradient: 'gradient-ranneeti-1', badge: 'Pre-Recruitment Event', title: 'RANNEETI', sub: 'Intra-College Strategy Battle' },
+                    { image: '', gradient: 'gradient-ranneeti-2', badge: 'Pre-Recruitment Event', title: 'Market Entry Pitch', sub: 'Real-World Case Simulations' },
+                    { image: '', gradient: 'gradient-ranneeti-3', badge: 'Pre-Recruitment Event', title: '1-on-1 Feedback', sub: 'Guidance from Senior Consultants' }
+                ]
+            }
+        ];
+
+        return DEFAULT_EVENTS;
+    },
+
+    async updateEvents(data) {
+        let success = false;
+        const payloadStr = JSON.stringify(data);
+
+        // 1. Save to Supabase recruitment_settings events_data column if supported
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?id=eq.1`, {
+                method: 'PATCH',
+                headers: { ...READ_HEADERS, 'Prefer': 'return=minimal' },
+                body: JSON.stringify({ events_data: data })
+            });
+            if (res.ok) success = true;
+        } catch(e) {}
+
+        // 2. Always persist to localStorage fallback & admin store
+        try {
+            localStorage.setItem('gdb_fallback_events', payloadStr);
+            const store = JSON.parse(localStorage.getItem('grandeur_admin_store') || '{}');
+            store.events = data;
+            localStorage.setItem('grandeur_admin_store', JSON.stringify(store));
+            success = true;
+        } catch(e) {}
+
+        window.GrandeurDB.clearCache();
+        window.dispatchEvent(new Event('grandeur_store_updated'));
+        return success;
     }
 };
 
 console.log("⚡ GrandeurDB Optimized Egress Engine loaded!");
+
 

@@ -601,6 +601,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderDynamicTeamGrid(localStore.team, teamHierarchy);
             }
         }
+
+        const eventsContainer = document.querySelector('#events-section .events-grid');
+        if (eventsContainer) {
+            let eventsData = null;
+            if (window.GrandeurDB && typeof window.GrandeurDB.getEvents === 'function') {
+                try {
+                    eventsData = await window.GrandeurDB.getEvents();
+                } catch(e) {}
+            }
+            if (!eventsData && localStore && localStore.events) {
+                eventsData = localStore.events;
+            }
+            if (eventsData && eventsData.length > 0) {
+                renderDynamicEvents(eventsData, eventsContainer);
+            }
+        }
     }
 
     function isRecruitmentActive(recData) {
@@ -984,6 +1000,79 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.renderDynamicLiveProjects = renderDynamicLiveProjects;
+
+    function renderDynamicEvents(eventsList, container) {
+        if (!container) return;
+        if (!Array.isArray(eventsList) || eventsList.length === 0) return;
+
+        const html = eventsList.map(ev => {
+            const title = escapeHtml(ev.title || '');
+            const tagline = escapeHtml(ev.tagline || '');
+            const desc = escapeHtml(ev.description || '');
+            const slides = Array.isArray(ev.slides) ? ev.slides : [];
+
+            const slidesHtml = slides.map(slide => {
+                const img = escapeHtml(slide.image || '');
+                const gradient = escapeHtml(slide.gradient || '');
+                const badge = escapeHtml(slide.badge || '');
+                const slideTitle = escapeHtml(slide.title || '');
+                const slideSub = escapeHtml(slide.sub || '');
+
+                if (img) {
+                    return `
+                        <div class="event-slide">
+                            <img src="${img}" alt="${slideTitle}">
+                            <div class="event-slide-overlay">
+                                ${badge ? `<span class="event-slide-badge">${badge}</span>` : ''}
+                                ${slideTitle ? `<h4 class="slide-title">${slideTitle}</h4>` : ''}
+                                ${slideSub ? `<p class="slide-sub">${slideSub}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    const bgClass = gradient || 'gradient-ranneeti-1';
+                    return `
+                        <div class="event-slide">
+                            <div class="event-slide-placeholder ${bgClass}">
+                                <svg class="event-bg-svg" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="200" cy="100" r="90" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" />
+                                    <circle cx="200" cy="100" r="40" fill="rgba(255,255,255,0.1)" />
+                                </svg>
+                                <div class="event-slide-overlay">
+                                    ${badge ? `<span class="event-slide-badge">${badge}</span>` : ''}
+                                    ${slideTitle ? `<h4 class="slide-title">${slideTitle}</h4>` : ''}
+                                    ${slideSub ? `<p class="slide-sub">${slideSub}</p>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+
+            return `
+                <div class="event-card">
+                    <div class="event-carousel">
+                        <div class="event-carousel-track">
+                            ${slidesHtml}
+                        </div>
+                        <button class="carousel-arrow prev" aria-label="Previous Slide">❮</button>
+                        <button class="carousel-arrow next" aria-label="Next Slide">❯</button>
+                        <div class="carousel-indicators"></div>
+                    </div>
+                    <div class="event-card-content">
+                        ${tagline ? `<span class="event-tagline">${tagline}</span>` : ''}
+                        <h3 class="event-card-title">${title}</h3>
+                        <p class="event-description">${desc}</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = html;
+        initEventCarousels();
+    }
+
+    window.renderDynamicEvents = renderDynamicEvents;
 
     function escapeHtml(str) {
         if (!str) return '';

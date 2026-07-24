@@ -127,6 +127,9 @@
                         <button class="admin-nav-item" data-tab="tab-live-projects">
                             <span class="nav-icon">🚀</span> Live Projects
                         </button>
+                        <button class="admin-nav-item" data-tab="tab-events">
+                            <span class="nav-icon">🎯</span> Events (What We Do)
+                        </button>
                     </nav>
                     
                     <div class="sidebar-footer-info">
@@ -447,6 +450,145 @@
                                 </table>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- TAB 8: EVENTS (WHAT WE DO) -->
+                    <div class="tab-panel" id="tab-events">
+                        <div class="panel-header">
+                            <div>
+                                <h1>Events (What We Do) Management</h1>
+                                <p>Manage and customize the 3 event cards (INVICTA, Echelon, Ranneeti) and all their internal elements, slides, images, titles, badges, and descriptions.</p>
+                            </div>
+                            <button class="btn btn-primary" id="btn-save-all-events">💾 Save All Events Changes</button>
+                        </div>
+
+                        <!-- GUIDE & INSTRUCTIONS: EVENTS -->
+                        <div class="admin-guide-card">
+                            <h4>🎯 Guide & Instructions: Events Management</h4>
+                            <p>Configure the 3 flagship events rendered on the <strong>What We Do</strong> page. Every single element is fully customizable:</p>
+                            <ul>
+                                <li>📌 <strong>Event Info:</strong> Edit Category Tagline, Event Title, and main Description paragraph.</li>
+                                <li>🖼️ <strong>Carousel Slides:</strong> Upload image files (PNG/JPG/WEBP) or supply image URLs. Customize top-left badge text, bold overlay titles, and subheadings.</li>
+                                <li>🔄 <strong>Slide Controls:</strong> Add new slides, remove slides, or reorder slides using ▲ / ▼ controls.</li>
+                            </ul>
+                        </div>
+
+                        <!-- EVENT SUB-NAV SELECTOR -->
+                        <div class="events-tab-buttons" style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+                            <button type="button" class="btn btn-outline event-subtab-btn active" data-event="invicta">🏆 INVICTA</button>
+                            <button type="button" class="btn btn-outline event-subtab-btn" data-event="echelon">⚡ ECHELON</button>
+                            <button type="button" class="btn btn-outline event-subtab-btn" data-event="ranneeti">⚔️ RANNEETI</button>
+                        </div>
+
+                        <form id="form-events-manager">
+                            <!-- EVENT 1: INVICTA -->
+                            <div class="admin-card event-editor-card" id="event-editor-invicta">
+                                <div class="card-header-flex">
+                                    <div>
+                                        <h3>🏆 INVICTA Event Settings</h3>
+                                        <p>Annual Flagship National Case Competition</p>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="grid grid-2" style="gap: 1.5rem;">
+                                        <div class="form-group">
+                                            <label for="event-invicta-tagline">Category / Tagline *</label>
+                                            <input type="text" id="event-invicta-tagline" class="form-input" placeholder="e.g. FLAGSHIP CASE COMPETITION" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="event-invicta-title">Event Title *</label>
+                                            <input type="text" id="event-invicta-title" class="form-input" placeholder="e.g. INVICTA" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="event-invicta-desc">Main Description Paragraph *</label>
+                                        <textarea id="event-invicta-desc" class="form-textarea" rows="3" placeholder="Description of INVICTA..." required style="width:100%; border-radius:8px; padding:0.75rem; border:1px solid var(--admin-border); background:var(--admin-input-bg); color:var(--admin-text);"></textarea>
+                                    </div>
+
+                                    <div class="event-slides-section" style="margin-top: 1.5rem; border-top: 1px solid var(--admin-border); padding-top: 1.25rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                            <h4 style="margin: 0; color: var(--admin-text); font-size: 1.1rem;">🖼️ Top Image Carousel Slides</h4>
+                                            <button type="button" class="btn btn-outline btn-sm btn-add-event-slide" data-event="invicta">➕ Add New Slide</button>
+                                        </div>
+                                        <div class="event-slides-list" id="slides-list-invicta" style="display: flex; flex-direction: column; gap: 1rem;">
+                                            <!-- Dynamically rendered slides -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- EVENT 2: ECHELON -->
+                            <div class="admin-card event-editor-card" id="event-editor-echelon" style="display: none;">
+                                <div class="card-header-flex">
+                                    <div>
+                                        <h3>⚡ ECHELON Event Settings</h3>
+                                        <p>Strategic Leadership Convention & Summit</p>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="grid grid-2" style="gap: 1.5rem;">
+                                        <div class="form-group">
+                                            <label for="event-echelon-tagline">Category / Tagline *</label>
+                                            <input type="text" id="event-echelon-tagline" class="form-input" placeholder="e.g. THE SIMULATION CHALLENGE" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="event-echelon-title">Event Title *</label>
+                                            <input type="text" id="event-echelon-title" class="form-input" placeholder="e.g. Echelon" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="event-echelon-desc">Main Description Paragraph *</label>
+                                        <textarea id="event-echelon-desc" class="form-textarea" rows="3" placeholder="Description of Echelon..." required style="width:100%; border-radius:8px; padding:0.75rem; border:1px solid var(--admin-border); background:var(--admin-input-bg); color:var(--admin-text);"></textarea>
+                                    </div>
+
+                                    <div class="event-slides-section" style="margin-top: 1.5rem; border-top: 1px solid var(--admin-border); padding-top: 1.25rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                            <h4 style="margin: 0; color: var(--admin-text); font-size: 1.1rem;">🖼️ Top Image Carousel Slides</h4>
+                                            <button type="button" class="btn btn-outline btn-sm btn-add-event-slide" data-event="echelon">➕ Add New Slide</button>
+                                        </div>
+                                        <div class="event-slides-list" id="slides-list-echelon" style="display: flex; flex-direction: column; gap: 1rem;">
+                                            <!-- Dynamically rendered slides -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- EVENT 3: RANNEETI -->
+                            <div class="admin-card event-editor-card" id="event-editor-ranneeti" style="display: none;">
+                                <div class="card-header-flex">
+                                    <div>
+                                        <h3>⚔️ RANNEETI Event Settings</h3>
+                                        <p>Intra-College Direct PI Competition</p>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="grid grid-2" style="gap: 1.5rem;">
+                                        <div class="form-group">
+                                            <label for="event-ranneeti-tagline">Category / Tagline *</label>
+                                            <input type="text" id="event-ranneeti-tagline" class="form-input" placeholder="e.g. INTRA-COLLEGE DIRECT PI COMPETITION" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="event-ranneeti-title">Event Title *</label>
+                                            <input type="text" id="event-ranneeti-title" class="form-input" placeholder="e.g. Ranneeti" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="event-ranneeti-desc">Main Description Paragraph *</label>
+                                        <textarea id="event-ranneeti-desc" class="form-textarea" rows="3" placeholder="Description of Ranneeti..." required style="width:100%; border-radius:8px; padding:0.75rem; border:1px solid var(--admin-border); background:var(--admin-input-bg); color:var(--admin-text);"></textarea>
+                                    </div>
+
+                                    <div class="event-slides-section" style="margin-top: 1.5rem; border-top: 1px solid var(--admin-border); padding-top: 1.25rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                            <h4 style="margin: 0; color: var(--admin-text); font-size: 1.1rem;">🖼️ Top Image Carousel Slides</h4>
+                                            <button type="button" class="btn btn-outline btn-sm btn-add-event-slide" data-event="ranneeti">➕ Add New Slide</button>
+                                        </div>
+                                        <div class="event-slides-list" id="slides-list-ranneeti" style="display: flex; flex-direction: column; gap: 1rem;">
+                                            <!-- Dynamically rendered slides -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
 
                 </div>
