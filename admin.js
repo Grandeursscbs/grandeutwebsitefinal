@@ -1888,13 +1888,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemId = item.id;
 
             const avatarContent = logo 
-                ? `<img src="${logo}" alt="${title}" style="width:100%; height:100%; object-fit:contain; border-radius:6px; background:#ffffff; padding:2px;">` 
-                : `<span style="font-size:1.1rem;">🏢</span>`;
+                ? `<img src="${logo}" alt="${title}" style="max-height:100%; max-width:100%; object-fit:contain;">` 
+                : `<span style="font-size:1.2rem;">🏢</span>`;
 
             return `
                 <tr>
                     <td>
-                        <div class="lp-client-avatar" style="background: #ffffff; width:40px; height:40px; border-radius:10px; color:#fff; font-weight:700; font-size:0.78rem; display:flex; align-items:center; justify-content:center; border: 1px solid var(--admin-border);">
+                        <div style="background: #ffffff; height:46px; min-width:46px; max-width:90px; border-radius:10px; display:flex; align-items:center; justify-content:center; border: 1px solid var(--admin-border); padding: 4px;">
                             ${avatarContent}
                         </div>
                     </td>

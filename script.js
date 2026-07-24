@@ -958,8 +958,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const logo = item.logo || item.client_logo || '';
 
             const avatarHtml = logo 
-                ? `<div class="lp-client-avatar" style="background: #ffffff; border: 1px solid var(--border, #e2e8f0); padding: 3px;"><img src="${logo}" alt="${title}" style="width:100%; height:100%; object-fit:contain; border-radius:6px;"></div>`
-                : `<div class="lp-client-avatar" style="background: linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%); font-size: 1.1rem;">🏢</div>`;
+                ? `<div class="lp-client-logo"><img src="${logo}" alt="${title}"></div>`
+                : `<div class="lp-client-avatar">🏢</div>`;
 
             const yearTagHtml = year ? `<span style="font-size: 0.72rem; font-weight: 600; color: var(--text-muted, #64748b); background: rgba(15, 29, 58, 0.04); padding: 0.2rem 0.6rem; border-radius: 12px; border: 1px solid rgba(15, 29, 58, 0.08); display: inline-block;">📅 ${year}</span>` : '';
 
