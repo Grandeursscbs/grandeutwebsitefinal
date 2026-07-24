@@ -963,7 +963,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? `<div class="lp-client-avatar" style="background: #ffffff; border: 1px solid var(--border, #e2e8f0); padding: 3px;"><img src="${logo}" alt="${title}" style="width:100%; height:100%; object-fit:contain; border-radius:6px;"></div>`
                 : `<div class="lp-client-avatar" style="background: linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%); font-size: 1.1rem;">🏢</div>`;
 
-            const yearTagHtml = year ? `<span style="font-size:0.72rem; font-weight:600; padding:0.3rem 0.65rem; border-radius:20px; background:rgba(15,29,58,0.05); color:var(--dark, #0f1d3a); border:1px solid rgba(15,29,58,0.1);">📅 ${year}</span>` : '';
+            const yearTagHtml = year ? `<span style="font-size: 0.72rem; font-weight: 600; color: var(--text-muted, #64748b); background: rgba(15, 29, 58, 0.04); padding: 0.2rem 0.6rem; border-radius: 12px; border: 1px solid rgba(15, 29, 58, 0.08); display: inline-block;">📅 ${year}</span>` : '';
 
             return `
                 <div class="lp-card">
@@ -971,9 +971,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="lp-client-badge">
                             ${avatarHtml}
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-end;">
-                            ${yearTagHtml}
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem;">
                             <span class="lp-domain-tag">${domainTag}</span>
+                            ${yearTagHtml}
                         </div>
                     </div>
                     <h3>${title}</h3>
