@@ -368,6 +368,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 cachedPrimers = await window.GrandeurDB.getKnowledgePrimers();
                 cachedAlumni = await window.GrandeurDB.getAlumniMembers();
                 cachedAchievements = await window.GrandeurDB.getAchievements();
+                if (window.GrandeurDB.getLiveProjects) {
+                    cachedLiveProjects = await window.GrandeurDB.getLiveProjects();
+                }
             } catch (err) {
                 console.warn("GrandeurDB fetch warning:", err);
             }
@@ -451,6 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderInboxList(inbox);
         renderAlumniTable(cachedAlumni);
         renderAchievementsTable(cachedAchievements);
+        renderLiveProjectsTable(cachedLiveProjects);
         renderApplicationsList(cachedApplications);
         hideAdminLoader();
     }
@@ -1790,6 +1794,150 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             showToast(`Removed achievement: ${item.title}`);
+            await renderDashboard();
+        }
+    };
+
+    // LIVE PROJECTS CRUD
+    let cachedLiveProjects = [];
+    const liveProjectsTableBody = document.getElementById('live-projects-table-body');
+    const modalLiveProject = document.getElementById('modal-live-project');
+    const btnOpenAddLiveProject = document.getElementById('btn-open-add-live-project-modal');
+    const btnCloseLiveProjectModal = document.getElementById('btn-close-live-project-modal');
+    const btnCancelLiveProjectModal = document.getElementById('btn-cancel-live-project-modal');
+    const formLiveProjectModal = document.getElementById('form-live-project-modal');
+
+    function renderLiveProjectsTable(list = cachedLiveProjects) {
+        if (!liveProjectsTableBody) return;
+
+        if (!list || list.length === 0) {
+            liveProjectsTableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 2.5rem; color: var(--admin-text-muted);">
+                        No live projects found. Click <strong>"➕ Add Live Project"</strong> above to create one.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        liveProjectsTableBody.innerHTML = list.map(item => {
+            const title = escapeHtml(item.title || item.client_name || '');
+            const clientCode = escapeHtml(item.client_code || title.slice(0, 3).toUpperCase() || 'LP');
+            const domainTag = escapeHtml(item.domain_tag || 'Consulting');
+            const description = escapeHtml(item.description || '');
+            const impactBadge = escapeHtml(item.impact_badge || '🚀 Live Project');
+            const isNeutral = item.badge_style === 'neutral' || item.is_neutral;
+            const avatarBg = item.avatar_bg ? item.avatar_bg : 'linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%)';
+            const itemId = item.id;
+
+            return `
+                <tr>
+                    <td>
+                        <div class="lp-client-avatar" style="background: ${avatarBg}; width:36px; height:36px; border-radius:8px; color:#fff; font-weight:700; font-size:0.78rem; display:flex; align-items:center; justify-content:center;">
+                            ${clientCode}
+                        </div>
+                    </td>
+                    <td><strong>${title}</strong></td>
+                    <td><span class="badge" style="background:rgba(30,64,175,0.1); color:#1e40af; border:1px solid rgba(30,64,175,0.2); font-weight:600;">${domainTag}</span></td>
+                    <td><span class="badge" style="${isNeutral ? 'background:#f1f5f9; color:#475569; border:1px solid #cbd5e1;' : 'background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;'} font-weight:600;">${impactBadge}</span></td>
+                    <td style="max-width: 320px; font-size:0.86rem; color:var(--admin-text-muted); line-height:1.4;">
+                        ${description.length > 90 ? description.substring(0, 90) + '...' : description}
+                    </td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <button class="btn btn-sm btn-outline" onclick="editLiveProject('${itemId}')" title="Edit Project">✏️ Edit</button>
+                        <button class="btn btn-sm btn-outline btn-danger" onclick="deleteLiveProject('${itemId}')" title="Delete Project">🗑️</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function openLiveProjectModal(item = null) {
+        if (!modalLiveProject) return;
+        document.getElementById('lp-edit-id').value = item ? item.id : '';
+        document.getElementById('lp-title').value = item ? (item.title || item.client_name || '') : '';
+        document.getElementById('lp-client-code').value = item ? (item.client_code || '') : '';
+        document.getElementById('lp-avatar-bg').value = item ? (item.avatar_bg || 'linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%)') : 'linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%)';
+        document.getElementById('lp-domain-tag').value = item ? (item.domain_tag || '') : '';
+        document.getElementById('lp-description').value = item ? (item.description || '') : '';
+        document.getElementById('lp-impact-badge').value = item ? (item.impact_badge || '') : '';
+        document.getElementById('lp-badge-style').value = item ? (item.badge_style || 'standard') : 'standard';
+        document.getElementById('modal-live-project-title').textContent = item ? 'Edit Live Project' : 'Add Live Project';
+        modalLiveProject.style.display = 'flex';
+    }
+
+    function closeLiveProjectModal() {
+        if (modalLiveProject) modalLiveProject.style.display = 'none';
+    }
+
+    if (btnOpenAddLiveProject) {
+        btnOpenAddLiveProject.addEventListener('click', () => openLiveProjectModal());
+    }
+
+    if (btnCloseLiveProjectModal) {
+        btnCloseLiveProjectModal.addEventListener('click', closeLiveProjectModal);
+    }
+
+    if (btnCancelLiveProjectModal) {
+        btnCancelLiveProjectModal.addEventListener('click', closeLiveProjectModal);
+    }
+
+    if (formLiveProjectModal) {
+        formLiveProjectModal.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('lp-edit-id').value;
+            const title = document.getElementById('lp-title').value.trim();
+            const client_code = document.getElementById('lp-client-code').value.trim() || title.slice(0, 3).toUpperCase();
+            const avatar_bg = document.getElementById('lp-avatar-bg').value;
+            const domain_tag = document.getElementById('lp-domain-tag').value.trim();
+            const description = document.getElementById('lp-description').value.trim();
+            const impact_badge = document.getElementById('lp-impact-badge').value.trim();
+            const badge_style = document.getElementById('lp-badge-style').value;
+
+            const payload = {
+                title,
+                client_code,
+                avatar_bg,
+                domain_tag,
+                description,
+                impact_badge,
+                badge_style
+            };
+
+            showToast(`⏳ Saving live project...`);
+
+            if (editId) {
+                if (window.GrandeurDB && window.GrandeurDB.updateLiveProject) {
+                    await window.GrandeurDB.updateLiveProject(editId, payload);
+                }
+                showToast(`✅ Live project updated!`);
+            } else {
+                if (window.GrandeurDB && window.GrandeurDB.insertLiveProject) {
+                    await window.GrandeurDB.insertLiveProject(payload);
+                }
+                showToast(`✅ Live project added!`);
+            }
+
+            closeLiveProjectModal();
+            await renderDashboard();
+        });
+    }
+
+    window.editLiveProject = function(id) {
+        const item = cachedLiveProjects.find(p => String(p.id) === String(id));
+        if (item) openLiveProjectModal(item);
+    };
+
+    window.deleteLiveProject = async function(id) {
+        const item = cachedLiveProjects.find(p => String(p.id) === String(id));
+        const name = item ? (item.title || item.client_name) : 'this live project';
+        if (confirm(`Are you sure you want to delete "${name}"?`)) {
+            showToast(`⏳ Deleting project...`);
+            if (window.GrandeurDB && window.GrandeurDB.deleteLiveProject) {
+                await window.GrandeurDB.deleteLiveProject(id);
+            }
+            showToast(`🗑️ Live project deleted.`);
             await renderDashboard();
         }
     };

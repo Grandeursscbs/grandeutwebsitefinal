@@ -939,6 +939,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.renderDynamicAchievements = renderDynamicAchievements;
 
+    function renderDynamicLiveProjects(projectsList, container) {
+        if (!container) return;
+        if (!projectsList || projectsList.length === 0) {
+            container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3.5rem 1.5rem; background: var(--bg-light, #f8fafc); border-radius: 16px; border: 1px dashed var(--border, #e2e8f0); color: var(--text-muted, #64748b);">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🚀</div>
+                <h4 style="margin: 0 0 0.5rem 0; color: var(--dark, #0f1d3a); font-weight: 600;">No Live Projects Listed Yet</h4>
+                <p style="margin: 0; font-size: 0.9rem;">Check back soon for new consulting engagements and partner collaborations!</p>
+            </div>`;
+            return;
+        }
+
+        const html = projectsList.map(item => {
+            const title = escapeHtml(item.title || item.client_name || '');
+            const clientCode = escapeHtml(item.client_code || title.slice(0, 3).toUpperCase() || 'LP');
+            const domainTag = escapeHtml(item.domain_tag || 'Consulting');
+            const description = escapeHtml(item.description || '');
+            const impactBadge = escapeHtml(item.impact_badge || '🚀 Live Project');
+            const isNeutral = item.badge_style === 'neutral' || item.is_neutral;
+            const avatarBg = item.avatar_bg ? item.avatar_bg : 'linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%)';
+
+            return `
+                <div class="lp-card">
+                    <div class="lp-card-header">
+                        <div class="lp-client-badge">
+                            <div class="lp-client-avatar" style="background: ${avatarBg};">${clientCode}</div>
+                        </div>
+                        <span class="lp-domain-tag">${domainTag}</span>
+                    </div>
+                    <h3>${title}</h3>
+                    <p>${description}</p>
+                    <div class="lp-impact-badge ${isNeutral ? 'badge-neutral' : ''}">${impactBadge}</div>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = html;
+    }
+
+    window.renderDynamicLiveProjects = renderDynamicLiveProjects;
+
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");

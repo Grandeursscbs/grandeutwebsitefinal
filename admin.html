@@ -124,6 +124,9 @@
                         <button class="admin-nav-item" data-tab="tab-alumni">
                             <span class="nav-icon">🎓</span> Alumni Network
                         </button>
+                        <button class="admin-nav-item" data-tab="tab-live-projects">
+                            <span class="nav-icon">🚀</span> Live Projects
+                        </button>
                     </nav>
                     
                     <div class="sidebar-footer-info">
@@ -405,6 +408,48 @@
                         </div>
                     </div>
 
+                    <!-- TAB 8: LIVE PROJECTS -->
+                    <div class="tab-panel" id="tab-live-projects">
+                        <div class="panel-header flex-between">
+                            <div>
+                                <h1>Live Projects Management</h1>
+                                <p>Add, edit, or remove corporate consulting live projects displayed on the "What We Do" page.</p>
+                            </div>
+                            <button class="btn btn-primary" id="btn-open-add-live-project-modal">➕ Add Live Project</button>
+                        </div>
+
+                        <!-- GUIDE & INSTRUCTIONS: LIVE PROJECTS -->
+                        <div class="admin-guide-card">
+                            <h4>🚀 Guide & Instructions: Live Projects</h4>
+                            <p>Manage active consulting projects with corporate partners, startups, and institutions.</p>
+                            <ul>
+                                <li>🏷️ <strong>Avatar & Initials:</strong> Provide a 3-letter abbreviation (e.g. <code>HON</code>, <code>KRG</code>) or avatar theme gradient.</li>
+                                <li>💼 <strong>Domain Tag:</strong> E.g., <em>GTM & Market Entry</em>, <em>Growth Strategy</em>, <em>Financial Modeling</em>.</li>
+                                <li>🚀 <strong>Impact Badge:</strong> Highlight key outcome metrics (e.g., <em>📊 Consumer Intelligence</em>, <em>⚡ +38% Web Traffic Growth</em>). Select <strong>Neutral / Confidential</strong> for NDA projects.</li>
+                            </ul>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 70px;">Avatar</th>
+                                            <th>Project / Client</th>
+                                            <th>Domain Tag</th>
+                                            <th>Impact Badge</th>
+                                            <th>Description</th>
+                                            <th style="text-align: right;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="live-projects-table-body">
+                                        <!-- Rendered dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -618,6 +663,70 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline" id="btn-cancel-achievement-modal">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="btn-save-achievement">Save Achievement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- LIVE PROJECT MODAL -->
+    <div class="admin-modal-overlay" id="modal-live-project" style="display: none;">
+        <div class="admin-modal" style="max-width: 620px;">
+            <div class="modal-header">
+                <h3 id="modal-live-project-title">Add Live Project</h3>
+                <button class="modal-close" id="btn-close-live-project-modal">&times;</button>
+            </div>
+            <form id="form-live-project-modal">
+                <input type="hidden" id="lp-edit-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="lp-title">Client / Project Name *</label>
+                        <input type="text" id="lp-title" class="form-input" placeholder="e.g. KRG Consultancy or Honasa Consumer (Mamaearth)" required>
+                    </div>
+                    <div class="form-row" style="display: flex; gap: 1rem;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="lp-client-code">Avatar Code / Initials</label>
+                            <input type="text" id="lp-client-code" class="form-input" placeholder="e.g. KRG, HON, KFT (Max 4 chars)" maxlength="6">
+                        </div>
+                        <div class="form-group" style="flex: 1.5;">
+                            <label for="lp-avatar-bg">Avatar Gradient Theme</label>
+                            <select id="lp-avatar-bg" class="form-input">
+                                <option value="linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%)">Deep Navy Blue (Default)</option>
+                                <option value="linear-gradient(135deg, #059669 0%, #10b981 100%)">Emerald Green</option>
+                                <option value="linear-gradient(135deg, #ea580c 0%, #f97316 100%)">Sunset Orange</option>
+                                <option value="linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)">Royal Purple</option>
+                                <option value="linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)">Sky Blue</option>
+                                <option value="linear-gradient(135deg, #b91c1c 0%, #ef4444 100%)">Crimson Red</option>
+                                <option value="linear-gradient(135deg, #334155 0%, #64748b 100%)">Slate Gray (Neutral / Confidential)</option>
+                                <option value="linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)">Teal Cyan</option>
+                                <option value="linear-gradient(135deg, #e11d48 0%, #fb7185 100%)">Rose Pink</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="lp-domain-tag">Domain / Category Tag *</label>
+                        <input type="text" id="lp-domain-tag" class="form-input" placeholder="e.g. GTM & Market Entry, Growth Strategy, Financial Modeling" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lp-description">Project Description *</label>
+                        <textarea id="lp-description" class="form-textarea" rows="3" placeholder="Brief details about scope of work, strategy formulated, analysis completed..." required style="width:100%; border-radius:8px; padding:0.75rem; border:1px solid var(--admin-border); background:var(--admin-input-bg); color:var(--admin-text);"></textarea>
+                    </div>
+                    <div class="form-row" style="display: flex; gap: 1rem;">
+                        <div class="form-group" style="flex: 1.5;">
+                            <label for="lp-impact-badge">Impact Badge Text *</label>
+                            <input type="text" id="lp-impact-badge" class="form-input" placeholder="e.g. 🚀 Market Entry Strategy, 📈 +20% User Engagement" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="lp-badge-style">Badge Style</label>
+                            <select id="lp-badge-style" class="form-input">
+                                <option value="standard">Standard Success (Green)</option>
+                                <option value="neutral">Neutral / Confidential (Slate)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="btn-cancel-live-project-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-live-project">Save Live Project</button>
                 </div>
             </form>
         </div>

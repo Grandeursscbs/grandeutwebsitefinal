@@ -405,5 +405,22 @@
     <!-- Supabase JS Client & Configuration -->
     <script src="supabase-config.js?v=26"></script>
     <script src="script.js?v=26"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('live-projects-container');
+            if (!container) return;
+
+            let projects = [];
+            if (window.GrandeurDB && typeof window.GrandeurDB.getLiveProjects === 'function') {
+                try {
+                    projects = await window.GrandeurDB.getLiveProjects();
+                } catch(e) { console.error("Error loading live projects from GrandeurDB:", e); }
+            }
+
+            if (window.renderDynamicLiveProjects) {
+                window.renderDynamicLiveProjects(projects, container);
+            }
+        });
+    </script>
 </body>
 </html>
