@@ -356,95 +356,84 @@ window.GrandeurDB = {
         return res.ok;
     },
 
-    // 9. LIVE PROJECTS
+    // 9. LIVE PROJECTS & UNIVERSAL CROSS-DEVICE SYNC ENGINE
     async getLiveProjects() {
         const cached = getSessionCachedData('live_projects');
-        if (cached) return cached;
+        if (cached && Array.isArray(cached) && cached.length > 0) return cached;
+
+        const DEFAULT_LIVE_PROJECTS = [
+            { id: 'lp_krg', title: 'KRG Consultancy', domain_tag: 'GTM & Market Entry', year: '2026', description: 'Formulated market entry roadmap and strategic expansion plan for enterprise clients in consulting.', logo: 'collab-krg.png' },
+            { id: 'lp_honasa', title: 'Honasa Consumer (Mamaearth)', domain_tag: 'Growth Strategy', year: '2025-26', description: 'Analyzed multi-channel customer acquisition tactics, retention metrics, and competitive positioning.', logo: 'collab-honasa.png' },
+            { id: 'lp_skilled_sapiens', title: 'Skilled Sapiens', domain_tag: 'Operational Excellence', year: '2025', description: 'Streamlined workflow processes and evaluated strategic partnership opportunities to optimize performance.', logo: 'collab-skilled-sapiens.png' },
+            { id: 'lp_upsurge', title: 'Upsurge', domain_tag: 'Financial Advisory', year: '2025', description: 'Developed financial modeling frameworks and valuation assessments for emerging tech platforms.', logo: 'collab-upsurge.png' },
+            { id: 'lp_thev', title: 'TheV Consulting', domain_tag: 'Market Research', year: '2024-25', description: 'Executed deep TAM/SAM/SOM market sizing and competitor benchmarking across sectors.', logo: 'collab-thev.png' },
+            { id: 'lp_atmoz', title: 'Atmoz', domain_tag: 'Brand Strategy', year: '2024', description: 'Designed GTM positioning and promotional channel strategies for digital growth.', logo: 'collab-atmoz.png' }
+        ];
+
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/live_projects?select=*&order=display_order.asc,created_at.desc`, { headers: READ_HEADERS });
-            if (res.ok) {
-                const data = await res.json();
-                if (data && data.length > 0) {
-                    setSessionCachedData('live_projects', data);
-                    try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(data)); } catch(e) {}
-                    return data;
-                }
+            const cmsPayload = await getSupabaseCMSPayload();
+            if (cmsPayload && Array.isArray(cmsPayload.live_projects) && cmsPayload.live_projects.length > 0) {
+                setSessionCachedData('live_projects', cmsPayload.live_projects);
+                try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(cmsPayload.live_projects)); } catch(e) {}
+                return cmsPayload.live_projects;
             }
         } catch(e) {}
 
         // Fallback to local storage
         try {
             const local = localStorage.getItem('gdb_fallback_live_projects');
-            if (local) return JSON.parse(local);
+            if (local) {
+                const parsed = JSON.parse(local);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
         } catch(e) {}
 
-        return [];
+        return DEFAULT_LIVE_PROJECTS;
     },
 
     async insertLiveProject(data) {
         let success = false;
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/live_projects`, {
-                method: 'POST',
-                headers: WRITE_HEADERS,
-                body: JSON.stringify(data)
-            });
-            if (res.ok) success = true;
-        } catch(e) {}
-
-        // Always sync with local storage fallback
-        try {
-            const local = JSON.parse(localStorage.getItem('gdb_fallback_live_projects') || '[]');
-            const newItem = { id: data.id || Date.now(), created_at: new Date().toISOString(), ...data };
-            local.unshift(newItem);
-            localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(local));
-            success = true;
+            const current = await this.getLiveProjects();
+            const newItem = { id: data.id || ('lp_' + Date.now()), created_at: new Date().toISOString(), ...data };
+            const updated = [newItem, ...current.filter(i => String(i.id) !== String(newItem.id))];
+            
+            success = await updateSupabaseCMSPayload({ live_projects: updated });
+            try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(updated)); } catch(e) {}
         } catch(e) {}
 
         window.GrandeurDB.clearCache();
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return success;
     },
 
     async updateLiveProject(id, data) {
         let success = false;
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/live_projects?id=eq.${id}`, {
-                method: 'PATCH',
-                headers: WRITE_HEADERS,
-                body: JSON.stringify(data)
-            });
-            if (res.ok) success = true;
-        } catch(e) {}
-
-        try {
-            let local = JSON.parse(localStorage.getItem('gdb_fallback_live_projects') || '[]');
-            local = local.map(item => String(item.id) === String(id) ? { ...item, ...data } : item);
-            localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(local));
-            success = true;
+            const current = await this.getLiveProjects();
+            const updated = current.map(item => String(item.id) === String(id) ? { ...item, ...data } : item);
+            
+            success = await updateSupabaseCMSPayload({ live_projects: updated });
+            try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(updated)); } catch(e) {}
         } catch(e) {}
 
         window.GrandeurDB.clearCache();
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return success;
     },
 
     async deleteLiveProject(id) {
         let success = false;
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/live_projects?id=eq.${id}`, {
-                method: 'DELETE',
-                headers: WRITE_HEADERS
-            });
-            if (res.ok) success = true;
-        } catch(e) {}
-
-        try {
-            let local = JSON.parse(localStorage.getItem('gdb_fallback_live_projects') || '[]');
-            local = local.filter(item => String(item.id) !== String(id));
-            localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(local));
-            success = true;
+            const current = await this.getLiveProjects();
+            const updated = current.filter(item => String(item.id) !== String(id));
+            
+            success = await updateSupabaseCMSPayload({ live_projects: updated });
+            try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(updated)); } catch(e) {}
         } catch(e) {}
 
         window.GrandeurDB.clearCache();
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return success;
     },
 
@@ -453,31 +442,6 @@ window.GrandeurDB = {
         const cached = getSessionCachedData('events');
         if (cached && Array.isArray(cached) && cached.length > 0) return cached;
         
-        try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=events_data&id=eq.1`, { headers: READ_HEADERS });
-            if (res.ok) {
-                const rows = await res.json();
-                if (rows && rows.length > 0 && rows[0].events_data) {
-                    const data = typeof rows[0].events_data === 'string' ? JSON.parse(rows[0].events_data) : rows[0].events_data;
-                    if (Array.isArray(data) && data.length > 0) {
-                        setSessionCachedData('events', data);
-                        try { localStorage.setItem('gdb_fallback_events', JSON.stringify(data)); } catch(e) {}
-                        return data;
-                    }
-                }
-            }
-        } catch(e) {}
-
-        // Fallback to Local Storage
-        try {
-            const local = localStorage.getItem('gdb_fallback_events');
-            if (local) {
-                const parsed = JSON.parse(local);
-                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-            }
-        } catch(e) {}
-
-        // Fallback to DEFAULT_EVENTS
         const DEFAULT_EVENTS = [
             {
                 id: 'invicta',
@@ -514,6 +478,24 @@ window.GrandeurDB = {
             }
         ];
 
+        try {
+            const cmsPayload = await getSupabaseCMSPayload();
+            if (cmsPayload && Array.isArray(cmsPayload.events) && cmsPayload.events.length > 0) {
+                setSessionCachedData('events', cmsPayload.events);
+                try { localStorage.setItem('gdb_fallback_events', JSON.stringify(cmsPayload.events)); } catch(e) {}
+                return cmsPayload.events;
+            }
+        } catch(e) {}
+
+        // Fallback to Local Storage
+        try {
+            const local = localStorage.getItem('gdb_fallback_events');
+            if (local) {
+                const parsed = JSON.parse(local);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch(e) {}
+
         return DEFAULT_EVENTS;
     },
 
@@ -521,23 +503,15 @@ window.GrandeurDB = {
         let success = false;
         const payloadStr = JSON.stringify(data);
 
-        // 1. Save to Supabase recruitment_settings events_data column if supported
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?id=eq.1`, {
-                method: 'PATCH',
-                headers: { ...READ_HEADERS, 'Prefer': 'return=minimal' },
-                body: JSON.stringify({ events_data: data })
-            });
-            if (res.ok) success = true;
+            success = await updateSupabaseCMSPayload({ events: data });
         } catch(e) {}
 
-        // 2. Always persist to localStorage fallback & admin store
         try {
             localStorage.setItem('gdb_fallback_events', payloadStr);
             const store = JSON.parse(localStorage.getItem('grandeur_admin_store') || '{}');
             store.events = data;
             localStorage.setItem('grandeur_admin_store', JSON.stringify(store));
-            success = true;
         } catch(e) {}
 
         window.GrandeurDB.clearCache();
@@ -546,6 +520,39 @@ window.GrandeurDB = {
     }
 };
 
+// Global Supabase CMS Payload Engine Helpers
+async function getSupabaseCMSPayload() {
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=form_url&id=eq.1`, { headers: READ_HEADERS });
+        if (res.ok) {
+            const rows = await res.json();
+            if (rows && rows.length > 0 && rows[0].form_url) {
+                try {
+                    const parsed = JSON.parse(rows[0].form_url);
+                    if (parsed && typeof parsed === 'object') return parsed;
+                } catch(e) {}
+            }
+        }
+    } catch(e) {}
+    return null;
+}
+
+async function updateSupabaseCMSPayload(storeUpdate) {
+    try {
+        let currentStore = (await getSupabaseCMSPayload()) || {};
+        const updatedStore = { ...currentStore, ...storeUpdate };
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?id=eq.1`, {
+            method: 'PATCH',
+            headers: { ...WRITE_HEADERS, 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ form_url: JSON.stringify(updatedStore) })
+        });
+        return res.ok;
+    } catch(e) {
+        return false;
+    }
+}
+
 console.log("⚡ GrandeurDB Optimized Egress Engine loaded!");
+
 
 
