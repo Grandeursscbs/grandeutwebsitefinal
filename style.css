@@ -2853,9 +2853,69 @@ a.resources-badge:hover {
     margin-top: auto;
 }
 
-@media (max-width: 992px) {
+
+/* Logo Matrix Styling (Achievements) */
+.logo-grid-matrix {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.25rem;
+    max-width: 1200px;
+    margin: 2.5rem auto 0;
+}
+
+.logo-matrix-card {
+    padding: 1.25rem 1rem;
+    height: 105px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.logo-matrix-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+    border-color: rgba(220, 38, 38, 0.2);
+}
+
+.logo-matrix-card img {
+    max-height: 68px;
+    max-width: 88%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.04));
+    transition: transform 0.25s ease;
+}
+
+.logo-matrix-card:hover img {
+    transform: scale(1.06);
+}
+
+@media (max-width: 1024px) {
+    .logo-grid-matrix {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
     .logo-grid-responsive {
         grid-template-columns: repeat(3, 1fr) !important;
+    }
+    .logo-grid-matrix {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+    .logo-matrix-card {
+        height: 90px;
+        padding: 1rem 0.75rem;
+    }
+    .logo-matrix-card img {
+        max-height: 56px;
     }
 }
 
@@ -2863,7 +2923,19 @@ a.resources-badge:hover {
     .logo-grid-responsive {
         grid-template-columns: repeat(2, 1fr) !important;
     }
+    .logo-grid-matrix {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    .logo-matrix-card {
+        height: 80px;
+        padding: 0.75rem 0.5rem;
+    }
+    .logo-matrix-card img {
+        max-height: 48px;
+    }
 }
+
 
 /* ==========================================================================
    Faculty Mentors Section Styling
