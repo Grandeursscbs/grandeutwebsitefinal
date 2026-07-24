@@ -116,43 +116,75 @@ window.GrandeurDB = {
         return true;
     },
 
-    // 2. RECRUITMENT SETTINGS
+    // 2. RECRUITMENT SETTINGS (Global Cloud Sync)
     async getRecruitment() {
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=*&id=eq.1`, { headers: READ_HEADERS });
             if (!res.ok) return null;
             const rows = await res.json();
-            return (rows && rows.length > 0) ? rows[0] : null;
+            if (!rows || rows.length === 0) return null;
+
+            const dbRow = rows[0];
+            let payloadData = {};
+            if (dbRow.form_url) {
+                try {
+                    const parsed = JSON.parse(dbRow.form_url);
+                    if (parsed && typeof parsed === 'object') {
+                        payloadData = parsed.recruitment || parsed;
+                    }
+                } catch(e) {}
+            }
+
+            return {
+                id: 1,
+                active: dbRow.active !== undefined ? (dbRow.active === true || dbRow.active === 'true') : (payloadData.active === true || payloadData.active === 'true'),
+                title: dbRow.title || payloadData.title || "Grandeur Recruitment Drive 2026",
+                description: dbRow.description || payloadData.description || "Join the premier Consulting & Knowledge Cell of SSCBS.",
+                deadline: dbRow.deadline || payloadData.deadline || "August 20, 2026",
+                deadline_datetime: payloadData.deadline_datetime || payloadData.deadlineDatetime || dbRow.deadline_datetime || "",
+                deadlineDatetime: payloadData.deadline_datetime || payloadData.deadlineDatetime || dbRow.deadline_datetime || "",
+                custom_questions: payloadData.custom_questions || payloadData.customQuestions || [],
+                customQuestions: payloadData.custom_questions || payloadData.customQuestions || []
+            };
         } catch(e) { return null; }
     },
 
     async updateRecruitment(data) {
         try {
-            const payload = { id: 1, ...data };
-            let updatedRows = [];
-            
-            // 1. Try PATCH with return=representation to see if row 1 exists
-            let res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?id=eq.1`, {
+            let currentPayload = (await getSupabaseCMSPayload()) || {};
+            const existingRec = currentPayload.recruitment || {};
+
+            const updatedRec = {
+                id: 1,
+                active: data.active !== undefined ? (data.active === true || data.active === 'true') : (existingRec.active === true || existingRec.active === 'true'),
+                title: data.title !== undefined ? data.title : (existingRec.title || "Grandeur Recruitment Drive 2026"),
+                description: data.description !== undefined ? data.description : (existingRec.description || "Join the premier Consulting & Knowledge Cell of SSCBS."),
+                deadline: data.deadline !== undefined ? data.deadline : (existingRec.deadline || "August 20, 2026"),
+                deadline_datetime: data.deadline_datetime || data.deadlineDatetime || existingRec.deadline_datetime || existingRec.deadlineDatetime || "",
+                deadlineDatetime: data.deadline_datetime || data.deadlineDatetime || existingRec.deadline_datetime || existingRec.deadlineDatetime || "",
+                custom_questions: data.custom_questions || data.customQuestions || existingRec.custom_questions || existingRec.customQuestions || [],
+                customQuestions: data.custom_questions || data.customQuestions || existingRec.custom_questions || existingRec.customQuestions || []
+            };
+
+            currentPayload.recruitment = updatedRec;
+
+            const patchBody = {
+                active: updatedRec.active,
+                title: updatedRec.title,
+                description: updatedRec.description,
+                deadline: updatedRec.deadline,
+                form_url: JSON.stringify(currentPayload)
+            };
+
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?id=eq.1`, {
                 method: 'PATCH',
-                headers: { ...READ_HEADERS, 'Prefer': 'return=representation' },
-                body: JSON.stringify(data)
+                headers: { ...READ_HEADERS, 'Prefer': 'return=minimal' },
+                body: JSON.stringify(patchBody)
             });
-            
-            if (res.ok) {
-                try { updatedRows = await res.json(); } catch(e) {}
-            }
-            
-            // 2. If row 1 did not exist, insert it via POST
-            if (!Array.isArray(updatedRows) || updatedRows.length === 0) {
-                res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings`, {
-                    method: 'POST',
-                    headers: { ...READ_HEADERS, 'Prefer': 'resolution=merge-duplicates,return=representation' },
-                    body: JSON.stringify(payload)
-                });
-            }
-            
+
             window.GrandeurDB.clearCache();
-            return true;
+            window.dispatchEvent(new Event('grandeur_store_updated'));
+            return res.ok;
         } catch(e) {
             console.warn("updateRecruitment error:", e);
             return false;

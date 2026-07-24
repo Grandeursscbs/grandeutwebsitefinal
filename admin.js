@@ -393,9 +393,14 @@ document.addEventListener('DOMContentLoaded', () => {
             description: "Join the premier Consulting & Knowledge Cell of SSCBS.",
             deadline: "August 20, 2026",
             deadline_datetime: "",
-            ...(recruitmentData && typeof recruitmentData === 'object' ? recruitmentData : {}),
-            ...localRec
+            ...localRec,
+            ...(recruitmentData && typeof recruitmentData === 'object' ? recruitmentData : {})
         };
+
+        if (recruitmentData && typeof recruitmentData === 'object') {
+            localStore.recruitment = recruitment;
+            saveStore(localStore);
+        }
 
         currentCustomQuestions = recruitment.custom_questions || recruitment.customQuestions || [];
         renderCustomQuestionsBuilder(currentCustomQuestions);
