@@ -602,6 +602,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        const liveProjectsContainer = document.getElementById('live-projects-container');
+        if (liveProjectsContainer) {
+            let liveProjectsData = null;
+            if (window.GrandeurDB && typeof window.GrandeurDB.getLiveProjects === 'function') {
+                try {
+                    liveProjectsData = await window.GrandeurDB.getLiveProjects();
+                } catch(e) {}
+            }
+            if (!liveProjectsData && localStore && localStore.live_projects) {
+                liveProjectsData = localStore.live_projects;
+            }
+            renderDynamicLiveProjects(liveProjectsData || [], liveProjectsContainer);
+        }
+
         const eventsContainer = document.querySelector('#events-section .events-grid');
         if (eventsContainer) {
             let eventsData = null;

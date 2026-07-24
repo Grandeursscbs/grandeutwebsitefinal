@@ -391,20 +391,11 @@ window.GrandeurDB = {
     // 9. LIVE PROJECTS & UNIVERSAL CROSS-DEVICE SYNC ENGINE
     async getLiveProjects() {
         const cached = getSessionCachedData('live_projects');
-        if (cached && Array.isArray(cached) && cached.length > 0) return cached;
-
-        const DEFAULT_LIVE_PROJECTS = [
-            { id: 'lp_krg', title: 'KRG Consultancy', domain_tag: 'GTM & Market Entry', year: '2026', description: 'Formulated market entry roadmap and strategic expansion plan for enterprise clients in consulting.', logo: 'collab-krg.png' },
-            { id: 'lp_honasa', title: 'Honasa Consumer (Mamaearth)', domain_tag: 'Growth Strategy', year: '2025-26', description: 'Analyzed multi-channel customer acquisition tactics, retention metrics, and competitive positioning.', logo: 'collab-honasa.png' },
-            { id: 'lp_skilled_sapiens', title: 'Skilled Sapiens', domain_tag: 'Operational Excellence', year: '2025', description: 'Streamlined workflow processes and evaluated strategic partnership opportunities to optimize performance.', logo: 'collab-skilled-sapiens.png' },
-            { id: 'lp_upsurge', title: 'Upsurge', domain_tag: 'Financial Advisory', year: '2025', description: 'Developed financial modeling frameworks and valuation assessments for emerging tech platforms.', logo: 'collab-upsurge.png' },
-            { id: 'lp_thev', title: 'TheV Consulting', domain_tag: 'Market Research', year: '2024-25', description: 'Executed deep TAM/SAM/SOM market sizing and competitor benchmarking across sectors.', logo: 'collab-thev.png' },
-            { id: 'lp_atmoz', title: 'Atmoz', domain_tag: 'Brand Strategy', year: '2024', description: 'Designed GTM positioning and promotional channel strategies for digital growth.', logo: 'collab-atmoz.png' }
-        ];
+        if (cached && Array.isArray(cached)) return cached;
 
         try {
             const cmsPayload = await getSupabaseCMSPayload();
-            if (cmsPayload && Array.isArray(cmsPayload.live_projects) && cmsPayload.live_projects.length > 0) {
+            if (cmsPayload && Array.isArray(cmsPayload.live_projects)) {
                 setSessionCachedData('live_projects', cmsPayload.live_projects);
                 try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(cmsPayload.live_projects)); } catch(e) {}
                 return cmsPayload.live_projects;
@@ -416,11 +407,11 @@ window.GrandeurDB = {
             const local = localStorage.getItem('gdb_fallback_live_projects');
             if (local) {
                 const parsed = JSON.parse(local);
-                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                if (Array.isArray(parsed)) return parsed;
             }
         } catch(e) {}
 
-        return DEFAULT_LIVE_PROJECTS;
+        return [];
     },
 
     async insertLiveProject(data) {
