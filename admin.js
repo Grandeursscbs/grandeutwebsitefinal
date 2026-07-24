@@ -1884,8 +1884,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const domainTag = escapeHtml(item.domain_tag || 'Consulting');
             const year = escapeHtml(item.year || item.project_year || '2026');
             const description = escapeHtml(item.description || '');
-            const impactBadge = escapeHtml(item.impact_badge || '🚀 Live Project');
-            const isNeutral = item.badge_style === 'neutral' || item.is_neutral;
             const logo = item.logo || item.client_logo || '';
             const itemId = item.id;
 
@@ -1903,7 +1901,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td><strong>${title}</strong></td>
                     <td><span class="badge" style="background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-weight:600;">${year}</span></td>
                     <td><span class="badge" style="background:rgba(30,64,175,0.1); color:#1e40af; border:1px solid rgba(30,64,175,0.2); font-weight:600;">${domainTag}</span></td>
-                    <td><span class="badge" style="${isNeutral ? 'background:#f1f5f9; color:#475569; border:1px solid #cbd5e1;' : 'background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;'} font-weight:600;">${impactBadge}</span></td>
                     <td style="max-width: 320px; font-size:0.86rem; color:var(--admin-text-muted); line-height:1.4;">
                         ${description.length > 90 ? description.substring(0, 90) + '...' : description}
                     </td>
@@ -1923,8 +1920,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('lp-domain-tag').value = item ? (item.domain_tag || '') : '';
         document.getElementById('lp-year').value = item ? (item.year || item.project_year || '') : '2026';
         document.getElementById('lp-description').value = item ? (item.description || '') : '';
-        document.getElementById('lp-impact-badge').value = item ? (item.impact_badge || '') : '';
-        document.getElementById('lp-badge-style').value = item ? (item.badge_style || 'standard') : 'standard';
 
         const logoUrl = item ? (item.logo || item.client_logo || '') : '';
         if (lpLogoHiddenInput) lpLogoHiddenInput.value = logoUrl;
@@ -1960,17 +1955,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const domain_tag = document.getElementById('lp-domain-tag').value.trim();
             const year = document.getElementById('lp-year').value.trim() || '2026';
             const description = document.getElementById('lp-description').value.trim();
-            const impact_badge = document.getElementById('lp-impact-badge').value.trim();
-            const badge_style = document.getElementById('lp-badge-style').value;
 
             const payload = {
                 title,
                 logo,
                 domain_tag,
                 year,
-                description,
-                impact_badge,
-                badge_style
+                description
             };
 
             showToast(`⏳ Saving live project...`);

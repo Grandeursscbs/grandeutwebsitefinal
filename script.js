@@ -955,8 +955,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const domainTag = escapeHtml(item.domain_tag || 'Consulting');
             const year = escapeHtml(item.year || item.project_year || '');
             const description = escapeHtml(item.description || '');
-            const impactBadge = escapeHtml(item.impact_badge || '🚀 Live Project');
-            const isNeutral = item.badge_style === 'neutral' || item.is_neutral;
             const logo = item.logo || item.client_logo || '';
 
             const avatarHtml = logo 
@@ -977,8 +975,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <h3>${title}</h3>
-                    <p>${description}</p>
-                    <div class="lp-impact-badge ${isNeutral ? 'badge-neutral' : ''}">${impactBadge}</div>
+                    <p style="margin-bottom: 0;">${description}</p>
                 </div>
             `;
         }).join('');
