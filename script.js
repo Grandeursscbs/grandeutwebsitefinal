@@ -952,17 +952,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const html = projectsList.map(item => {
             const title = escapeHtml(item.title || item.client_name || '');
-            const clientCode = escapeHtml(item.client_code || title.slice(0, 3).toUpperCase() || 'LP');
             const domainTag = escapeHtml(item.domain_tag || 'Consulting');
             const description = escapeHtml(item.description || '');
             const impactBadge = escapeHtml(item.impact_badge || '🚀 Live Project');
             const isNeutral = item.badge_style === 'neutral' || item.is_neutral;
-            const avatarBg = item.avatar_bg ? item.avatar_bg : 'linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%)';
             const logo = item.logo || item.client_logo || '';
 
             const avatarHtml = logo 
                 ? `<div class="lp-client-avatar" style="background: #ffffff; border: 1px solid var(--border, #e2e8f0); padding: 3px;"><img src="${logo}" alt="${title}" style="width:100%; height:100%; object-fit:contain; border-radius:6px;"></div>`
-                : `<div class="lp-client-avatar" style="background: ${avatarBg};">${clientCode}</div>`;
+                : `<div class="lp-client-avatar" style="background: linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%); font-size: 1.1rem;">🏢</div>`;
 
             return `
                 <div class="lp-card">

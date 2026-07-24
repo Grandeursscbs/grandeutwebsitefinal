@@ -1881,23 +1881,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         liveProjectsTableBody.innerHTML = list.map(item => {
             const title = escapeHtml(item.title || item.client_name || '');
-            const clientCode = escapeHtml(item.client_code || title.slice(0, 3).toUpperCase() || 'LP');
             const domainTag = escapeHtml(item.domain_tag || 'Consulting');
             const description = escapeHtml(item.description || '');
             const impactBadge = escapeHtml(item.impact_badge || '🚀 Live Project');
             const isNeutral = item.badge_style === 'neutral' || item.is_neutral;
-            const avatarBg = item.avatar_bg ? item.avatar_bg : 'linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%)';
             const logo = item.logo || item.client_logo || '';
             const itemId = item.id;
 
             const avatarContent = logo 
                 ? `<img src="${logo}" alt="${title}" style="width:100%; height:100%; object-fit:contain; border-radius:6px; background:#ffffff; padding:2px;">` 
-                : clientCode;
+                : `<span style="font-size:1.1rem;">🏢</span>`;
 
             return `
                 <tr>
                     <td>
-                        <div class="lp-client-avatar" style="background: ${logo ? '#ffffff' : avatarBg}; width:40px; height:40px; border-radius:10px; color:#fff; font-weight:700; font-size:0.78rem; display:flex; align-items:center; justify-content:center; border: 1px solid var(--admin-border);">
+                        <div class="lp-client-avatar" style="background: #ffffff; width:40px; height:40px; border-radius:10px; color:#fff; font-weight:700; font-size:0.78rem; display:flex; align-items:center; justify-content:center; border: 1px solid var(--admin-border);">
                             ${avatarContent}
                         </div>
                     </td>
@@ -1920,8 +1918,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!modalLiveProject) return;
         document.getElementById('lp-edit-id').value = item ? item.id : '';
         document.getElementById('lp-title').value = item ? (item.title || item.client_name || '') : '';
-        document.getElementById('lp-client-code').value = item ? (item.client_code || '') : '';
-        document.getElementById('lp-avatar-bg').value = item ? (item.avatar_bg || 'linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%)') : 'linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%)';
         document.getElementById('lp-domain-tag').value = item ? (item.domain_tag || '') : '';
         document.getElementById('lp-description').value = item ? (item.description || '') : '';
         document.getElementById('lp-impact-badge').value = item ? (item.impact_badge || '') : '';
@@ -1958,8 +1954,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const editId = document.getElementById('lp-edit-id').value;
             const title = document.getElementById('lp-title').value.trim();
             const logo = document.getElementById('lp-logo') ? document.getElementById('lp-logo').value : '';
-            const client_code = document.getElementById('lp-client-code').value.trim() || title.slice(0, 3).toUpperCase();
-            const avatar_bg = document.getElementById('lp-avatar-bg').value;
             const domain_tag = document.getElementById('lp-domain-tag').value.trim();
             const description = document.getElementById('lp-description').value.trim();
             const impact_badge = document.getElementById('lp-impact-badge').value.trim();
@@ -1968,8 +1962,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const payload = {
                 title,
                 logo,
-                client_code,
-                avatar_bg,
                 domain_tag,
                 description,
                 impact_badge,

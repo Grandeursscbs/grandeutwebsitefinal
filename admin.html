@@ -423,7 +423,7 @@
                             <h4>🚀 Guide & Instructions: Live Projects</h4>
                             <p>Manage active consulting projects with corporate partners, startups, and institutions.</p>
                             <ul>
-                                <li>🏷️ <strong>Avatar & Initials:</strong> Provide a 3-letter abbreviation (e.g. <code>HON</code>, <code>KRG</code>) or avatar theme gradient.</li>
+                                <li>🏢 <strong>Company Logo:</strong> Upload corporate/partner logo image (PNG, JPG, SVG, WEBP).</li>
                                 <li>💼 <strong>Domain Tag:</strong> E.g., <em>GTM & Market Entry</em>, <em>Growth Strategy</em>, <em>Financial Modeling</em>.</li>
                                 <li>🚀 <strong>Impact Badge:</strong> Highlight key outcome metrics (e.g., <em>📊 Consumer Intelligence</em>, <em>⚡ +38% Web Traffic Growth</em>). Select <strong>Neutral / Confidential</strong> for NDA projects.</li>
                             </ul>
@@ -683,7 +683,7 @@
                         <input type="text" id="lp-title" class="form-input" placeholder="e.g. KRG Consultancy or Honasa Consumer (Mamaearth)" required>
                     </div>
                     <div class="form-group">
-                        <label for="lp-logo-file">Company / Client Logo (Upload Image - Recommended)</label>
+                        <label for="lp-logo-file">Company / Client Logo (Upload Image)</label>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <input type="file" id="lp-logo-file" class="form-input" accept="image/*" style="padding: 0.4rem;">
                             <input type="hidden" id="lp-logo">
@@ -692,27 +692,7 @@
                                 <span id="lp-logo-preview-icon" style="font-size: 1.2rem;">🏢</span>
                             </div>
                         </div>
-                        <small style="color: var(--admin-text-muted); display: block; margin-top: 0.3rem;">Upload company logo (PNG, JPG, SVG, WEBP). If not uploaded, fallback initials avatar will be used.</small>
-                    </div>
-                    <div class="form-row" style="display: flex; gap: 1rem;">
-                        <div class="form-group" style="flex: 1;">
-                            <label for="lp-client-code">Avatar Code / Initials (Fallback)</label>
-                            <input type="text" id="lp-client-code" class="form-input" placeholder="e.g. KRG, HON, KFT (Max 4 chars)" maxlength="6">
-                        </div>
-                        <div class="form-group" style="flex: 1.5;">
-                            <label for="lp-avatar-bg">Avatar Gradient Theme</label>
-                            <select id="lp-avatar-bg" class="form-input">
-                                <option value="linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%)">Deep Navy Blue (Default)</option>
-                                <option value="linear-gradient(135deg, #059669 0%, #10b981 100%)">Emerald Green</option>
-                                <option value="linear-gradient(135deg, #ea580c 0%, #f97316 100%)">Sunset Orange</option>
-                                <option value="linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)">Royal Purple</option>
-                                <option value="linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)">Sky Blue</option>
-                                <option value="linear-gradient(135deg, #b91c1c 0%, #ef4444 100%)">Crimson Red</option>
-                                <option value="linear-gradient(135deg, #334155 0%, #64748b 100%)">Slate Gray (Neutral / Confidential)</option>
-                                <option value="linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)">Teal Cyan</option>
-                                <option value="linear-gradient(135deg, #e11d48 0%, #fb7185 100%)">Rose Pink</option>
-                            </select>
-                        </div>
+                        <small style="color: var(--admin-text-muted); display: block; margin-top: 0.3rem;">Upload company logo (PNG, JPG, SVG, WEBP). Recommended square image.</small>
                     </div>
                     <div class="form-group">
                         <label for="lp-domain-tag">Domain / Category Tag *</label>
