@@ -682,9 +682,21 @@
                         <label for="lp-title">Client / Project Name *</label>
                         <input type="text" id="lp-title" class="form-input" placeholder="e.g. KRG Consultancy or Honasa Consumer (Mamaearth)" required>
                     </div>
+                    <div class="form-group">
+                        <label for="lp-logo-file">Company / Client Logo (Upload Image - Recommended)</label>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <input type="file" id="lp-logo-file" class="form-input" accept="image/*" style="padding: 0.4rem;">
+                            <input type="hidden" id="lp-logo">
+                            <div id="lp-logo-preview-box" style="width: 46px; height: 46px; border-radius: 10px; border: 2px dashed var(--admin-gold); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #ffffff; flex-shrink: 0;">
+                                <img id="lp-logo-preview-img" src="" alt="" style="width: 100%; height: 100%; object-fit: contain; display: none; padding: 4px;">
+                                <span id="lp-logo-preview-icon" style="font-size: 1.2rem;">🏢</span>
+                            </div>
+                        </div>
+                        <small style="color: var(--admin-text-muted); display: block; margin-top: 0.3rem;">Upload company logo (PNG, JPG, SVG, WEBP). If not uploaded, fallback initials avatar will be used.</small>
+                    </div>
                     <div class="form-row" style="display: flex; gap: 1rem;">
                         <div class="form-group" style="flex: 1;">
-                            <label for="lp-client-code">Avatar Code / Initials</label>
+                            <label for="lp-client-code">Avatar Code / Initials (Fallback)</label>
                             <input type="text" id="lp-client-code" class="form-input" placeholder="e.g. KRG, HON, KFT (Max 4 chars)" maxlength="6">
                         </div>
                         <div class="form-group" style="flex: 1.5;">

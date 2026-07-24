@@ -1807,6 +1807,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCancelLiveProjectModal = document.getElementById('btn-cancel-live-project-modal');
     const formLiveProjectModal = document.getElementById('form-live-project-modal');
 
+    const lpLogoFileInput = document.getElementById('lp-logo-file');
+    const lpLogoHiddenInput = document.getElementById('lp-logo');
+    const lpLogoPreviewImg = document.getElementById('lp-logo-preview-img');
+    const lpLogoPreviewIcon = document.getElementById('lp-logo-preview-icon');
+
+    if (lpLogoFileInput) {
+        lpLogoFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            showToast(`⏳ Processing company logo...`);
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 400;
+
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL('image/png', 0.85);
+                    if (lpLogoHiddenInput) lpLogoHiddenInput.value = compressedBase64;
+                    updateLpLogoPreview(compressedBase64);
+                    showToast(`✅ Logo optimized!`);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function updateLpLogoPreview(url) {
+        if (url && lpLogoPreviewImg && lpLogoPreviewIcon) {
+            lpLogoPreviewImg.src = url;
+            lpLogoPreviewImg.style.display = 'block';
+            lpLogoPreviewIcon.style.display = 'none';
+        } else if (lpLogoPreviewImg && lpLogoPreviewIcon) {
+            lpLogoPreviewImg.src = '';
+            lpLogoPreviewImg.style.display = 'none';
+            lpLogoPreviewIcon.style.display = 'block';
+        }
+    }
+
     function renderLiveProjectsTable(list = cachedLiveProjects) {
         if (!liveProjectsTableBody) return;
 
@@ -1829,13 +1887,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const impactBadge = escapeHtml(item.impact_badge || '🚀 Live Project');
             const isNeutral = item.badge_style === 'neutral' || item.is_neutral;
             const avatarBg = item.avatar_bg ? item.avatar_bg : 'linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%)';
+            const logo = item.logo || item.client_logo || '';
             const itemId = item.id;
+
+            const avatarContent = logo 
+                ? `<img src="${logo}" alt="${title}" style="width:100%; height:100%; object-fit:contain; border-radius:6px; background:#ffffff; padding:2px;">` 
+                : clientCode;
 
             return `
                 <tr>
                     <td>
-                        <div class="lp-client-avatar" style="background: ${avatarBg}; width:36px; height:36px; border-radius:8px; color:#fff; font-weight:700; font-size:0.78rem; display:flex; align-items:center; justify-content:center;">
-                            ${clientCode}
+                        <div class="lp-client-avatar" style="background: ${logo ? '#ffffff' : avatarBg}; width:40px; height:40px; border-radius:10px; color:#fff; font-weight:700; font-size:0.78rem; display:flex; align-items:center; justify-content:center; border: 1px solid var(--admin-border);">
+                            ${avatarContent}
                         </div>
                     </td>
                     <td><strong>${title}</strong></td>
@@ -1863,6 +1926,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('lp-description').value = item ? (item.description || '') : '';
         document.getElementById('lp-impact-badge').value = item ? (item.impact_badge || '') : '';
         document.getElementById('lp-badge-style').value = item ? (item.badge_style || 'standard') : 'standard';
+
+        const logoUrl = item ? (item.logo || item.client_logo || '') : '';
+        if (lpLogoHiddenInput) lpLogoHiddenInput.value = logoUrl;
+        if (lpLogoFileInput) lpLogoFileInput.value = '';
+        updateLpLogoPreview(logoUrl);
+
         document.getElementById('modal-live-project-title').textContent = item ? 'Edit Live Project' : 'Add Live Project';
         modalLiveProject.style.display = 'flex';
     }
@@ -1888,6 +1957,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const editId = document.getElementById('lp-edit-id').value;
             const title = document.getElementById('lp-title').value.trim();
+            const logo = document.getElementById('lp-logo') ? document.getElementById('lp-logo').value : '';
             const client_code = document.getElementById('lp-client-code').value.trim() || title.slice(0, 3).toUpperCase();
             const avatar_bg = document.getElementById('lp-avatar-bg').value;
             const domain_tag = document.getElementById('lp-domain-tag').value.trim();
@@ -1897,6 +1967,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const payload = {
                 title,
+                logo,
                 client_code,
                 avatar_bg,
                 domain_tag,
