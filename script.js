@@ -944,6 +944,134 @@ document.addEventListener('DOMContentLoaded', () => {
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
+    // Event Carousel Auto-Swipe (Every 3 seconds)
+    function initEventCarousels() {
+        const carousels = document.querySelectorAll('.event-carousel');
+        carousels.forEach(carousel => {
+            const track = carousel.querySelector('.event-carousel-track');
+            const slides = carousel.querySelectorAll('.event-slide');
+            const dotsContainer = carousel.querySelector('.carousel-indicators');
+            const prevBtn = carousel.querySelector('.carousel-arrow.prev');
+            const nextBtn = carousel.querySelector('.carousel-arrow.next');
+
+            if (!track || slides.length === 0) return;
+
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+            let autoSlideTimer = null;
+
+            // Generate indicator dots
+            if (dotsContainer && dotsContainer.children.length === 0) {
+                slides.forEach((_, idx) => {
+                    const dot = document.createElement('button');
+                    dot.className = `carousel-dot ${idx === 0 ? 'active' : ''}`;
+                    dot.setAttribute('aria-label', `Go to slide ${idx + 1}`);
+                    dot.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        goToSlide(idx);
+                        resetTimer();
+                    });
+                    dotsContainer.appendChild(dot);
+                });
+            }
+
+            const dots = dotsContainer ? dotsContainer.querySelectorAll('.carousel-dot') : [];
+
+            function updateSlidePosition() {
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                dots.forEach((dot, idx) => {
+                    if (idx === currentIndex) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
+            }
+
+            function goToSlide(index) {
+                currentIndex = (index + totalSlides) % totalSlides;
+                updateSlidePosition();
+            }
+
+            function nextSlide() {
+                goToSlide(currentIndex + 1);
+            }
+
+            function prevSlide() {
+                goToSlide(currentIndex - 1);
+            }
+
+            function startTimer() {
+                stopTimer();
+                autoSlideTimer = setInterval(nextSlide, 3000);
+            }
+
+            function stopTimer() {
+                if (autoSlideTimer) {
+                    clearInterval(autoSlideTimer);
+                    autoSlideTimer = null;
+                }
+            }
+
+            function resetTimer() {
+                startTimer();
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    prevSlide();
+                    resetTimer();
+                });
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    nextSlide();
+                    resetTimer();
+                });
+            }
+
+            // Pause on hover
+            carousel.addEventListener('mouseenter', stopTimer);
+            carousel.addEventListener('mouseleave', startTimer);
+
+            // Touch Swipe support
+            let startX = 0;
+            let isSwiping = false;
+
+            carousel.addEventListener('touchstart', (e) => {
+                if (e.touches && e.touches[0]) {
+                    startX = e.touches[0].clientX;
+                    isSwiping = true;
+                    stopTimer();
+                }
+            }, { passive: true });
+
+            carousel.addEventListener('touchend', (e) => {
+                if (!isSwiping) return;
+                isSwiping = false;
+                if (e.changedTouches && e.changedTouches[0]) {
+                    const endX = e.changedTouches[0].clientX;
+                    const diffX = startX - endX;
+                    if (Math.abs(diffX) > 35) {
+                        if (diffX > 0) {
+                            nextSlide();
+                        } else {
+                            prevSlide();
+                        }
+                    }
+                }
+                startTimer();
+            }, { passive: true });
+
+            startTimer();
+        });
+    }
+
+    initEventCarousels();
+
     // Execute sync
     syncGrandeurCMS();
     window.addEventListener('grandeur_store_updated', syncGrandeurCMS);
