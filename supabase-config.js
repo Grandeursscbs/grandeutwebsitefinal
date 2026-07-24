@@ -354,6 +354,98 @@ window.GrandeurDB = {
             headers: WRITE_HEADERS
         });
         return res.ok;
+    },
+
+    // 9. LIVE PROJECTS
+    async getLiveProjects() {
+        const cached = getSessionCachedData('live_projects');
+        if (cached) return cached;
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/live_projects?select=*&order=display_order.asc,created_at.desc`, { headers: READ_HEADERS });
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.length > 0) {
+                    setSessionCachedData('live_projects', data);
+                    try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(data)); } catch(e) {}
+                    return data;
+                }
+            }
+        } catch(e) {}
+
+        // Fallback to local storage
+        try {
+            const local = localStorage.getItem('gdb_fallback_live_projects');
+            if (local) return JSON.parse(local);
+        } catch(e) {}
+
+        return [];
+    },
+
+    async insertLiveProject(data) {
+        let success = false;
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/live_projects`, {
+                method: 'POST',
+                headers: WRITE_HEADERS,
+                body: JSON.stringify(data)
+            });
+            if (res.ok) success = true;
+        } catch(e) {}
+
+        // Always sync with local storage fallback
+        try {
+            const local = JSON.parse(localStorage.getItem('gdb_fallback_live_projects') || '[]');
+            const newItem = { id: data.id || Date.now(), created_at: new Date().toISOString(), ...data };
+            local.unshift(newItem);
+            localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(local));
+            success = true;
+        } catch(e) {}
+
+        window.GrandeurDB.clearCache();
+        return success;
+    },
+
+    async updateLiveProject(id, data) {
+        let success = false;
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/live_projects?id=eq.${id}`, {
+                method: 'PATCH',
+                headers: WRITE_HEADERS,
+                body: JSON.stringify(data)
+            });
+            if (res.ok) success = true;
+        } catch(e) {}
+
+        try {
+            let local = JSON.parse(localStorage.getItem('gdb_fallback_live_projects') || '[]');
+            local = local.map(item => String(item.id) === String(id) ? { ...item, ...data } : item);
+            localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(local));
+            success = true;
+        } catch(e) {}
+
+        window.GrandeurDB.clearCache();
+        return success;
+    },
+
+    async deleteLiveProject(id) {
+        let success = false;
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/live_projects?id=eq.${id}`, {
+                method: 'DELETE',
+                headers: WRITE_HEADERS
+            });
+            if (res.ok) success = true;
+        } catch(e) {}
+
+        try {
+            let local = JSON.parse(localStorage.getItem('gdb_fallback_live_projects') || '[]');
+            local = local.filter(item => String(item.id) !== String(id));
+            localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(local));
+            success = true;
+        } catch(e) {}
+
+        window.GrandeurDB.clearCache();
+        return success;
     }
 };
 
