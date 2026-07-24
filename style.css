@@ -2037,118 +2037,64 @@ a.resources-badge:hover {
    ========================================== */
 
 /* Service Cards Bento Grid & Design */
+/* Service Cards Bento Grid & Design */
 .services-bento-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-    margin-top: 3rem;
+    gap: 1.75rem;
+    margin-top: 2.5rem;
 }
 
 .service-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    overflow: hidden;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 16px;
+    padding: 1.85rem;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     height: 100%;
     cursor: default;
+    position: relative;
 }
 
 .service-card:hover {
-    box-shadow: 0 12px 32px rgba(15, 29, 58, 0.08);
-    border-color: rgba(var(--primary-rgb), 0.25);
-}
-
-.service-image-container {
-    position: relative;
-    width: 100%;
-    height: 180px;
-    overflow: hidden;
-}
-
-.service-placeholder-gradient {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(15, 29, 58, 0.08);
+    border-color: rgba(var(--primary-rgb), 0.3);
 }
 
 /* Service Category Badges inside Card Header */
 .service-card-badge {
-    position: absolute;
-    bottom: 1rem;
-    left: 1.25rem;
-    z-index: 5;
-    background: rgba(15, 23, 42, 0.65);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-    font-size: 0.75rem;
+    position: relative;
+    z-index: 1;
+    background: rgba(var(--primary-rgb), 0.06);
+    border: 1px solid rgba(var(--primary-rgb), 0.15);
+    color: var(--primary);
+    font-size: 0.78rem;
     font-weight: 600;
-    letter-spacing: 0.5px;
-    padding: 0.35rem 0.85rem;
+    letter-spacing: 0.3px;
+    padding: 0.35rem 0.8rem;
     border-radius: 20px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.4rem;
+    width: fit-content;
+    margin-bottom: 1.1rem;
 }
 
-/* Grid blueprint overlay for premium feel */
-.service-image-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-    background-size: 20px 20px;
-    z-index: 2;
-    pointer-events: none;
-}
-
-/* Vibrant gradient backgrounds for Service Cards */
-.gradient-1 { background: linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #3a506b 100%); } /* Market Research */
-.gradient-2 { background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #10b981 100%); } /* Financial Planning */
-.gradient-3 { background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 50%, #c084fc 100%); } /* Growth Marketing */
-.gradient-4 { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #3b82f6 100%); } /* Strategic Advisory */
-.gradient-5 { background: linear-gradient(135deg, #111827 0%, #1f2937 50%, #4b5563 100%); } /* Sector Analysis */
-.gradient-6 { background: linear-gradient(135deg, #7c2d12 0%, #c2410c 50%, #fb923c 100%); } /* Operational Excellence */
-.gradient-7 { background: linear-gradient(135deg, #0f172a 0%, #334155 50%, #64748b 100%); } /* Publications & Research */
-
-/* Abstract shapes inside the image container */
-.service-placeholder-svg {
-    position: absolute;
-    width: 110%;
-    height: 110%;
-    opacity: 0.3;
-}
-
-.service-card-content {
-    padding: 1.75rem;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-.service-card-content h3 {
+.service-card h3 {
     font-size: 1.25rem;
     color: var(--dark);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.65rem;
     font-weight: 700;
+    line-height: 1.35;
 }
 
-.service-card-content p {
+.service-card p {
     color: var(--text-muted);
-    font-size: 0.95rem;
+    font-size: 0.93rem;
     line-height: 1.6;
     margin-bottom: 0;
     flex-grow: 1;
@@ -2246,23 +2192,6 @@ a.resources-badge:hover {
     background: #f8fafc;
     color: #475569;
     border-color: #e2e8f0;
-}
-
-/* Bento Grid Spans for index.html */
-@media (min-width: 992px) {
-    .service-card-wide {
-        grid-column: span 2;
-        flex-direction: row;
-    }
-    
-    .service-card-wide .service-image-container {
-        width: 45%;
-        height: 100%;
-    }
-    
-    .service-card-wide .service-card-content {
-        width: 55%;
-    }
 }
 
 @media (max-width: 991px) {
