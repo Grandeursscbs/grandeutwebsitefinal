@@ -333,13 +333,6 @@ a {
     animation: fadeIn 0.8s ease-out;
 }
 
-.hero-badge .badge-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: #FBC523;
-    box-shadow: 0 0 8px #FBC523;
-}
 
 .hero-bottom-divider {
     position: absolute;
