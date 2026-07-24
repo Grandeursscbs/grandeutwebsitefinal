@@ -2609,6 +2609,13 @@ a.resources-badge:hover {
     margin: 0;
 }
 
+.achievement-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+}
+
 .achievement-members-row {
     display: flex;
     align-items: center;
@@ -2640,6 +2647,9 @@ a.resources-badge:hover {
 }
 
 .achievement-year-badge {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
     background: #f1f5f9;
     color: #0f1d3a;
     font-size: 0.78rem;
@@ -2647,7 +2657,9 @@ a.resources-badge:hover {
     padding: 0.2rem 0.65rem;
     border-radius: 6px;
     letter-spacing: 0.04em;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #cbd5e1;
+    display: inline-flex;
+    align-items: center;
 }
 
 @media (max-width: 768px) {
@@ -2875,22 +2887,6 @@ a.resources-badge:hover {
 .rank-general {
     background: linear-gradient(135deg, #0f1d3a, #1e3a8a);
     color: #ffffff;
-}
-
-.achievement-year-badge {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    z-index: 5;
-    background: rgba(15, 23, 42, 0.75);
-    color: #ffffff;
-    padding: 0.25rem 0.65rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .achievement-card-content {

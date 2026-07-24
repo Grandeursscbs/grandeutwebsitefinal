@@ -844,20 +844,25 @@ document.addEventListener('DOMContentLoaded', () => {
             `<div class="achievement-institution-logo-wrap"><img src="${escapeHtml(meta.logo)}" alt="${escapeHtml(meta.title)} Logo" class="achievement-institution-logo"></div>` :
             `<div class="achievement-institution-logo-wrap fallback"><span style="font-size: 1.5rem;">🏛️</span></div>`;
 
+        const descValid = meta.description && meta.description.trim() !== '' && meta.description.trim().toLowerCase() !== 'no';
+
         return `
             <div class="achievement-horizontal-card" data-card-index="${cardIdx}">
                 <div class="achievement-card-left">
                     ${logoMarkup}
                 </div>
                 <div class="achievement-card-center">
-                    <h3 class="achievement-card-title">${escapeHtml(meta.title)}</h3>
+                    <div class="achievement-title-row">
+                        <h3 class="achievement-card-title">${escapeHtml(meta.title)}</h3>
+                        <span class="achievement-year-badge">${escapeHtml(meta.year)}</span>
+                    </div>
                     ${meta.members ? `
                         <div class="achievement-members-row">
                             <span style="font-size:0.9rem;">👥</span>
                             <span class="members-text"><strong>Team Members:</strong> ${escapeHtml(meta.members)}</span>
                         </div>
                     ` : ''}
-                    ${meta.description ? `
+                    ${descValid ? `
                         <div class="achievement-desc-row">
                             <span style="font-size:0.85rem; color:#d97706;">📝</span>
                             <span class="desc-text">${escapeHtml(meta.description)}</span>
@@ -865,8 +870,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ` : ''}
                 </div>
                 <div class="achievement-card-right">
-                    <span class="achievement-rank-pill ${rankClass}" style="position: static; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 0.82rem; font-weight: 700; padding: 0.35rem 0.8rem; border-radius: 20px;">${rankIcon} ${escapeHtml(meta.position)}</span>
-                    <span class="achievement-year-badge">${escapeHtml(meta.year)}</span>
+                    <span class="achievement-rank-pill ${rankClass}" style="position: static; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 0.82rem; font-weight: 700; padding: 0.4rem 0.95rem; border-radius: 20px;">${rankIcon} ${escapeHtml(meta.position)}</span>
                 </div>
             </div>
         `;
