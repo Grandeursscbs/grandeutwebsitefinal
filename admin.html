@@ -436,6 +436,7 @@
                                         <tr>
                                             <th style="width: 70px;">Avatar</th>
                                             <th>Project / Client</th>
+                                            <th>Year</th>
                                             <th>Domain Tag</th>
                                             <th>Impact Badge</th>
                                             <th>Description</th>
@@ -694,9 +695,15 @@
                         </div>
                         <small style="color: var(--admin-text-muted); display: block; margin-top: 0.3rem;">Upload company logo (PNG, JPG, SVG, WEBP). Recommended square image.</small>
                     </div>
-                    <div class="form-group">
-                        <label for="lp-domain-tag">Domain / Category Tag *</label>
-                        <input type="text" id="lp-domain-tag" class="form-input" placeholder="e.g. GTM & Market Entry, Growth Strategy, Financial Modeling" required>
+                    <div class="form-row" style="display: flex; gap: 1rem;">
+                        <div class="form-group" style="flex: 2;">
+                            <label for="lp-domain-tag">Domain / Category Tag *</label>
+                            <input type="text" id="lp-domain-tag" class="form-input" placeholder="e.g. GTM & Market Entry, Growth Strategy" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="lp-year">Project Year *</label>
+                            <input type="text" id="lp-year" class="form-input" placeholder="e.g. 2026 or 2025-26" required>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="lp-description">Project Description *</label>

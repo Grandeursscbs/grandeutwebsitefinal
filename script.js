@@ -953,6 +953,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const html = projectsList.map(item => {
             const title = escapeHtml(item.title || item.client_name || '');
             const domainTag = escapeHtml(item.domain_tag || 'Consulting');
+            const year = escapeHtml(item.year || item.project_year || '');
             const description = escapeHtml(item.description || '');
             const impactBadge = escapeHtml(item.impact_badge || '🚀 Live Project');
             const isNeutral = item.badge_style === 'neutral' || item.is_neutral;
@@ -962,13 +963,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? `<div class="lp-client-avatar" style="background: #ffffff; border: 1px solid var(--border, #e2e8f0); padding: 3px;"><img src="${logo}" alt="${title}" style="width:100%; height:100%; object-fit:contain; border-radius:6px;"></div>`
                 : `<div class="lp-client-avatar" style="background: linear-gradient(135deg, #0f1d3a 0%, #1e40af 100%); font-size: 1.1rem;">🏢</div>`;
 
+            const yearTagHtml = year ? `<span style="font-size:0.72rem; font-weight:600; padding:0.3rem 0.65rem; border-radius:20px; background:rgba(15,29,58,0.05); color:var(--dark, #0f1d3a); border:1px solid rgba(15,29,58,0.1);">📅 ${year}</span>` : '';
+
             return `
                 <div class="lp-card">
                     <div class="lp-card-header">
                         <div class="lp-client-badge">
                             ${avatarHtml}
                         </div>
-                        <span class="lp-domain-tag">${domainTag}</span>
+                        <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-end;">
+                            ${yearTagHtml}
+                            <span class="lp-domain-tag">${domainTag}</span>
+                        </div>
                     </div>
                     <h3>${title}</h3>
                     <p>${description}</p>
