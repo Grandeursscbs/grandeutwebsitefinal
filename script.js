@@ -969,15 +969,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const html = projectsList.map(item => {
             const title = escapeHtml(item.title || item.client_name || '');
             const domainTag = escapeHtml(item.domain_tag || 'Consulting');
-            const year = escapeHtml(item.year || item.project_year || '');
             const description = escapeHtml(item.description || '');
             const logo = item.logo || item.client_logo || '';
 
             const avatarHtml = logo 
                 ? `<div class="lp-client-logo"><img src="${logo}" alt="${title}"></div>`
                 : `<div class="lp-client-avatar">🏢</div>`;
-
-            const yearTagHtml = year ? `<span style="font-size: 0.72rem; font-weight: 600; color: var(--text-muted, #64748b); background: rgba(15, 29, 58, 0.04); padding: 0.2rem 0.6rem; border-radius: 12px; border: 1px solid rgba(15, 29, 58, 0.08); display: inline-block;">📅 ${year}</span>` : '';
 
             return `
                 <div class="lp-card">
@@ -987,7 +984,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem;">
                             <span class="lp-domain-tag">${domainTag}</span>
-                            ${yearTagHtml}
                         </div>
                     </div>
                     <h3>${title}</h3>
