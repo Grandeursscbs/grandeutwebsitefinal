@@ -919,14 +919,26 @@ window.GRANDEUR_STATIC_DATA = {
     {
       "id": "invicta",
       "title": "INVICTA",
-      "tagline": "Flagship Case Competition",
-      "description": "Grandeur's premier national case study competition bringing together sharp business minds from across top universities to solve complex corporate and strategic challenges.",
+      "tagline": "The Case Study Challenge",
+      "description": "Grandeur's premier national case study competition, attracting 2,200+ participants last year and bringing together the brightest business minds from top universities to solve complex corporate and strategic challenges.",
       "slides": [
         {
+          "image": "invicta-1.jpg",
+          "badge": "",
+          "title": "",
+          "sub": ""
+        },
+        {
           "image": "invicta-2.jpg",
-          "badge": "Annual Flagship Event",
-          "title": "1,500+ Participants",
-          "sub": "Top B-Schools & DU Circuit"
+          "badge": "",
+          "title": "",
+          "sub": ""
+        },
+        {
+          "image": "invicta-3.jpg",
+          "badge": "",
+          "title": "",
+          "sub": ""
         }
       ]
     },
