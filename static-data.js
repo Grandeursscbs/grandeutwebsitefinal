@@ -912,7 +912,7 @@ window.GRANDEUR_STATIC_DATA = {
       "title": "Hobbeeme",
       "logo": "collab-hobbeeme.png",
       "domain_tag": "Customer Acquisition & Vendor Growth",
-      "description": "Developed customer acquisition, branding and vendor growth strategies for UAE-based hobby marketplace through research and analysis."
+      "description": "Developed customer acquisition, branding & vendor growth strategies for UAE-based hobby market through research & analysis."
     }
   ],
   "events": [
