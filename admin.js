@@ -427,50 +427,62 @@ function initAdminConsole() {
             renderEventsEditor(Array.isArray(cachedEvents) ? cachedEvents : []);
             renderApplicationsList(Array.isArray(cachedApplications) && cachedApplications.length > 0 ? cachedApplications : (localStore.applications || []));
 
-            let recruitmentData = null;
-            let teamData = null;
-            let inboxData = [];
-
+            // Background sync from Supabase without blocking UI render
             if (window.GrandeurDB) {
-                try {
-                    updateAdminLoader('🔄 Fetching recruitments, team, live projects & publications in parallel...', 65);
-                    const [
-                        recRes,
-                        appRes,
-                        teamRes,
-                        inboxRes,
-                        primersRes,
-                        alumniRes,
-                        achievementsRes,
-                        liveProjectsRes,
-                        eventsRes
-                    ] = await Promise.allSettled([
-                        window.GrandeurDB.getRecruitment(),
-                        window.GrandeurDB.getRecruitmentApplications ? window.GrandeurDB.getRecruitmentApplications() : Promise.resolve([]),
-                        window.GrandeurDB.getTeamMembers(),
-                        window.GrandeurDB.getContactInquiries(),
-                        window.GrandeurDB.getKnowledgePrimers(),
-                        window.GrandeurDB.getAlumniMembers(),
-                        window.GrandeurDB.getAchievements(),
-                        window.GrandeurDB.getLiveProjects ? window.GrandeurDB.getLiveProjects() : Promise.resolve([]),
-                        window.GrandeurDB.getEvents ? window.GrandeurDB.getEvents() : Promise.resolve([])
-                    ]);
-
-                    if (recRes.status === 'fulfilled') recruitmentData = recRes.value;
-                    if (appRes.status === 'fulfilled') cachedApplications = appRes.value || [];
-                    if (teamRes.status === 'fulfilled') teamData = teamRes.value || [];
-                    if (inboxRes.status === 'fulfilled') inboxData = inboxRes.value || [];
-                    if (primersRes.status === 'fulfilled') cachedPrimers = primersRes.value || [];
-                    if (alumniRes.status === 'fulfilled') cachedAlumni = alumniRes.value || [];
-                    if (achievementsRes.status === 'fulfilled') cachedAchievements = achievementsRes.value || [];
-                    if (liveProjectsRes.status === 'fulfilled') cachedLiveProjects = liveProjectsRes.value || [];
-                    if (eventsRes.status === 'fulfilled') {
-                        cachedEvents = eventsRes.value || [];
+                Promise.allSettled([
+                    window.GrandeurDB.getRecruitment(),
+                    window.GrandeurDB.getRecruitmentApplications ? window.GrandeurDB.getRecruitmentApplications() : Promise.resolve([]),
+                    window.GrandeurDB.getTeamMembers(),
+                    window.GrandeurDB.getContactInquiries(),
+                    window.GrandeurDB.getKnowledgePrimers(),
+                    window.GrandeurDB.getAlumniMembers(),
+                    window.GrandeurDB.getAchievements(),
+                    window.GrandeurDB.getLiveProjects ? window.GrandeurDB.getLiveProjects() : Promise.resolve([]),
+                    window.GrandeurDB.getEvents ? window.GrandeurDB.getEvents() : Promise.resolve([])
+                ]).then(([recRes, appRes, teamRes, inboxRes, primersRes, alumniRes, achievementsRes, liveProjectsRes, eventsRes]) => {
+                    if (recRes.status === 'fulfilled' && recRes.value) {
+                        const localStore = getStore() || {};
+                        localStore.recruitment = { ...localStore.recruitment, ...recRes.value };
+                        saveStore(localStore);
+                    }
+                    if (appRes.status === 'fulfilled' && Array.isArray(appRes.value)) {
+                        cachedApplications = appRes.value;
+                        renderApplicationsList(cachedApplications);
+                    }
+                    if (teamRes.status === 'fulfilled' && Array.isArray(teamRes.value)) {
+                        cachedTeam = teamRes.value;
+                        renderTeamTable(cachedTeam);
+                        const statTeam = document.getElementById('stat-team-count');
+                        if (statTeam) statTeam.textContent = cachedTeam.length;
+                    }
+                    if (inboxRes.status === 'fulfilled' && Array.isArray(inboxRes.value)) {
+                        renderInboxList(inboxRes.value);
+                        const statInbox = document.getElementById('stat-inbox-count');
+                        if (statInbox) statInbox.textContent = inboxRes.value.length;
+                    }
+                    if (primersRes.status === 'fulfilled' && Array.isArray(primersRes.value)) {
+                        cachedPrimers = primersRes.value;
+                        renderKnowledgeTable(cachedPrimers);
+                        const statP = document.getElementById('stat-primers-count');
+                        if (statP) statP.textContent = cachedPrimers.length;
+                    }
+                    if (alumniRes.status === 'fulfilled' && Array.isArray(alumniRes.value)) {
+                        cachedAlumni = alumniRes.value;
+                        renderAlumniTable(cachedAlumni);
+                    }
+                    if (achievementsRes.status === 'fulfilled' && Array.isArray(achievementsRes.value)) {
+                        cachedAchievements = achievementsRes.value;
+                        renderAchievementsTable(cachedAchievements);
+                    }
+                    if (liveProjectsRes.status === 'fulfilled' && Array.isArray(liveProjectsRes.value)) {
+                        cachedLiveProjects = liveProjectsRes.value;
+                        renderLiveProjectsTable(cachedLiveProjects);
+                    }
+                    if (eventsRes.status === 'fulfilled' && Array.isArray(eventsRes.value)) {
+                        cachedEvents = eventsRes.value;
                         renderEventsEditor(cachedEvents);
                     }
-                } catch (err) {
-                    console.warn("GrandeurDB fetch warning:", err);
-                }
+                }).catch(err => console.warn("Background Sync warning:", err));
             }
 
             if ((!cachedApplications || !Array.isArray(cachedApplications) || cachedApplications.length === 0) && Array.isArray(localStore.applications)) {
