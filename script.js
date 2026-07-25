@@ -427,7 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let isDown = false;
         let startX;
         let scrollLeftVal;
-        let autoScrollSpeed = 0.8; // Pixels per frame
+        let autoScrollSpeed = 0.4; // Pixels per frame (slowed down for smoother reading)
         let isInteracting = false;
         let interactionTimeout;
         

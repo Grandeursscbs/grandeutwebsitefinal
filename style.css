@@ -1758,7 +1758,7 @@ a.resources-badge:hover {
     display: flex;
     width: max-content;
     align-items: center;
-    animation: marquee 30s linear infinite;
+    animation: marquee 60s linear infinite;
 }
 
 .marquee-content:hover {
