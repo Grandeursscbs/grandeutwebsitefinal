@@ -195,21 +195,14 @@
                         }
 
                         try {
-                            let data = window.GrandeurDB ? await window.GrandeurDB.getTeamMembers() : [];
-                            if (!Array.isArray(data) || data.length === 0) {
-                                const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/team_members?select=id,name,role,tier,photo,linkedin&role=not.ilike.*batch%20of*&order=created_at.asc', {
-                                    headers: {
-                                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
-                                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs'
-                                    }
-                                });
-                                if (res.ok) {
-                                    const raw = await res.json();
-                                    data = (raw || []).filter(m => !m.role || !m.role.toLowerCase().includes('batch of'));
-                                }
+                            let data = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.activeTeam) || [];
+                            if (window.GrandeurDB) {
+                                try {
+                                    const fetched = await window.GrandeurDB.getTeamMembers();
+                                    if (Array.isArray(fetched) && fetched.length > 0) data = fetched;
+                                } catch(e) {}
                             }
-                            if (Array.isArray(data) && data.length > 0) {
-                                renderInlineGrid(data);
+                            renderInlineGrid(data);
                             }
                         } catch(e) {
                             console.error("Inline load error:", e);
@@ -255,7 +248,8 @@
         </div>
     </footer>
 
-    <!-- Supabase JS Client & Configuration -->
+    <!-- Static Data & Configuration -->
+    <script src="static-data.js?v=1"></script>
     <script src="supabase-config.js?v=26"></script>
     <script src="script.js?v=26"></script>
 </body>

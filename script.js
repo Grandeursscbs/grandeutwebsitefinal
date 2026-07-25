@@ -538,14 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function getSupabase() {
-        if (window.supabaseClient) return window.supabaseClient;
-        if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
-            window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-            return window.supabaseClient;
-        }
-        return null;
-    }
+
 
     async function syncGrandeurCMS() {
         const teamHierarchy = document.querySelector('.team-hierarchy');

@@ -232,7 +232,8 @@
         </div>
     </footer>
 
-    <!-- Supabase JS Client & Configuration -->
+    <!-- Static Data & Configuration -->
+    <script src="static-data.js?v=1"></script>
     <script src="supabase-config.js?v=26"></script>
     <script src="script.js?v=26"></script>
     <script>
@@ -240,23 +241,12 @@
             const container = document.getElementById('achievements-live-container');
             if (!container) return;
 
-            let achievements = [];
-            if (window.GrandeurDB && typeof window.GrandeurDB.getAchievements === 'function') {
+            let achievements = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.achievements) || [];
+            if (window.GrandeurDB) {
                 try {
-                    achievements = await window.GrandeurDB.getAchievements();
-                } catch(e) { console.error("Error loading achievements from GrandeurDB:", e); }
-            }
-
-            if ((!achievements || achievements.length === 0) && window.SUPABASE_ANON_KEY) {
-                try {
-                    const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/achievements?select=id,event_name,position,year,team_name,created_at&order=created_at.desc', {
-                        headers: {
-                            'apikey': window.SUPABASE_ANON_KEY,
-                            'Authorization': 'Bearer ' + window.SUPABASE_ANON_KEY
-                        }
-                    });
-                    if (res.ok) achievements = await res.json();
-                } catch(e) { console.error("Direct fetch error:", e); }
+                    const fetched = await window.GrandeurDB.getAchievements();
+                    if (Array.isArray(fetched) && fetched.length > 0) achievements = fetched;
+                } catch(e) {}
             }
 
             if (window.renderDynamicAchievements) {

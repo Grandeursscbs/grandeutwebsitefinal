@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Grandeur SSCBS - Admin Console JavaScript (Supabase Integrated)
+   Grandeur SSCBS - Admin Console JavaScript (Static CMS)
    ========================================================================== */
 
 function initAdminConsole() {
@@ -8,14 +8,7 @@ function initAdminConsole() {
     let cachedAlumni = [];
     let cachedEvents = [];
 
-    function getSupabase() {
-        if (window.supabaseClient) return window.supabaseClient;
-        if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
-            window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-            return window.supabaseClient;
-        }
-        return null;
-    }
+    // Static local data mode
 
     // Default Fallback
     const DEFAULT_STORE = {
@@ -437,7 +430,7 @@ function initAdminConsole() {
             // Instantly unblock dashboard & remove loading overlay (0ms UI latency)
             hideAdminLoader();
 
-            // Background sync from Supabase without blocking UI render
+            // Local static data render
             if (window.GrandeurDB) {
                 Promise.allSettled([
                     window.GrandeurDB.getRecruitment(),
@@ -638,7 +631,7 @@ function initAdminConsole() {
             store.recruitment = payload;
             saveStore(store);
 
-            // 2. Sync to Supabase DB asynchronously
+            // 2. Save locally
             if (window.GrandeurDB) {
                 try {
                     await window.GrandeurDB.updateRecruitment(payload);
@@ -684,7 +677,7 @@ function initAdminConsole() {
             store.recruitment = payload;
             saveStore(store);
 
-            // 2. Sync to Supabase DB asynchronously
+            // 2. Save locally
             if (window.GrandeurDB) {
                 try {
                     await window.GrandeurDB.updateRecruitment(payload);

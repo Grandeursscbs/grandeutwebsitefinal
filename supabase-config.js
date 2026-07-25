@@ -1,62 +1,18 @@
 /* ==========================================================================
-   Grandeur SSCBS - Direct Native Supabase Engine (Zero-Dependency REST API)
-   Optimized Bandwidth & High Performance Smart Caching Engine
+   Grandeur SSCBS - Static Data Engine (Zero External DB Dependencies)
    ========================================================================== */
 
-const SUPABASE_URL = 'https://mtycgxndnaxdusqsvqqs.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs';
-
-const READ_HEADERS = {
-    'apikey': SUPABASE_ANON_KEY,
-    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-    'Content-Type': 'application/json'
-};
-
-const WRITE_HEADERS = {
-    'apikey': SUPABASE_ANON_KEY,
-    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-    'Content-Type': 'application/json',
-    'Prefer': 'return=minimal'
-};
-
-const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours persistent cache TTL
-const gdbMemoryCache = new Map();
-
-function getSessionCachedData(key) {
+function getLocalStore(key, defaultData) {
     try {
-        if (gdbMemoryCache.has(key)) {
-            const cached = gdbMemoryCache.get(key);
-            if (Date.now() - cached.timestamp < CACHE_TTL_MS) {
-                return cached.data;
-            }
-            gdbMemoryCache.delete(key);
-        }
-        if (typeof window !== 'undefined') {
-            const stores = [window.localStorage, window.sessionStorage];
-            for (const store of stores) {
-                if (!store) continue;
-                const raw = store.getItem('gdb_cache_' + key);
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (Date.now() - parsed.timestamp < CACHE_TTL_MS) {
-                        gdbMemoryCache.set(key, parsed);
-                        return parsed.data;
-                    }
-                }
-            }
-        }
+        const raw = localStorage.getItem('gdb_local_' + key);
+        if (raw) return JSON.parse(raw);
     } catch(e) {}
-    return null;
+    return defaultData;
 }
 
-function setSessionCachedData(key, data) {
+function setLocalStore(key, data) {
     try {
-        const item = JSON.stringify({ timestamp: Date.now(), data: data });
-        gdbMemoryCache.set(key, { timestamp: Date.now(), data: data });
-        if (typeof window !== 'undefined') {
-            if (window.localStorage) window.localStorage.setItem('gdb_cache_' + key, item);
-            if (window.sessionStorage) window.sessionStorage.setItem('gdb_cache_' + key, item);
-        }
+        localStorage.setItem('gdb_local_' + key, JSON.stringify(data));
     } catch(e) {}
 }
 
@@ -80,7 +36,6 @@ function sortPrimersByYearDesc(primers) {
 window.GrandeurDB = {
     clearCache() {
         try {
-            gdbMemoryCache.clear();
             ['sessionStorage', 'localStorage'].forEach(st => {
                 const store = window[st];
                 if (store) {
@@ -92,601 +47,249 @@ window.GrandeurDB = {
         } catch(e) {}
     },
 
-    // 1. TEAM MEMBERS CRUD (Current Team Only)
-    async getTeamMembers(bypassCache = false) {
-        if (!bypassCache) {
-            const cached = getSessionCachedData('team_members');
-            if (cached && Array.isArray(cached)) return cached;
-        }
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=id,name,role,tier,photo,linkedin&role=not.ilike.*batch%20of*&order=created_at.asc`, { headers: READ_HEADERS });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        const rows = await res.json();
-        const filtered = (rows || []).filter(m => !m.role || !m.role.toLowerCase().includes('batch of'));
-        setSessionCachedData('team_members', filtered);
-        return filtered;
+    // 1. TEAM MEMBERS (Current Active Team)
+    async getTeamMembers() {
+        const staticTeam = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.activeTeam) || [];
+        return getLocalStore('team_members', staticTeam);
     },
 
     async insertTeamMember(data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members`, {
-            method: 'POST',
-            headers: WRITE_HEADERS,
-            body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        window.GrandeurDB.clearCache();
+        const list = await this.getTeamMembers();
+        const newItem = { id: 'tm_' + Date.now(), created_at: new Date().toISOString(), ...data };
+        const updated = [newItem, ...list];
+        setLocalStore('team_members', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return true;
     },
 
     async updateTeamMember(id, data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?id=eq.${id}`, {
-            method: 'PATCH',
-            headers: WRITE_HEADERS,
-            body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        window.GrandeurDB.clearCache();
+        const list = await this.getTeamMembers();
+        const updated = list.map(item => String(item.id) === String(id) ? { ...item, ...data } : item);
+        setLocalStore('team_members', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return true;
     },
 
     async deleteTeamMember(id) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?id=eq.${id}`, {
-            method: 'DELETE',
-            headers: WRITE_HEADERS
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        window.GrandeurDB.clearCache();
+        const list = await this.getTeamMembers();
+        const updated = list.filter(item => String(item.id) !== String(id));
+        setLocalStore('team_members', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return true;
     },
 
-    // 2. RECRUITMENT SETTINGS (Global Cloud Sync)
-    async getRecruitment(bypassCache = false) {
-        if (!bypassCache) {
-            const cached = getSessionCachedData('recruitment_settings');
-            if (cached) return cached;
-        }
-        try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=*&id=eq.1`, { headers: READ_HEADERS });
-            if (!res.ok) return null;
-            const rows = await res.json();
-            if (!rows || rows.length === 0) return null;
-
-            const dbRow = rows[0];
-            let payloadData = {};
-            if (dbRow.form_url) {
-                try {
-                    const parsed = JSON.parse(dbRow.form_url);
-                    if (parsed && typeof parsed === 'object') {
-                        payloadData = parsed.recruitment || parsed;
-                    }
-                } catch(e) {}
-            }
-
-            const result = {
-                id: 1,
-                active: dbRow.active !== undefined ? (dbRow.active === true || dbRow.active === 'true') : (payloadData.active === true || payloadData.active === 'true'),
-                title: dbRow.title || payloadData.title || "Grandeur Recruitment Drive 2026",
-                description: dbRow.description || payloadData.description || "Join the premier Consulting & Knowledge Cell of SSCBS.",
-                deadline: dbRow.deadline || payloadData.deadline || "August 20, 2026",
-                deadline_datetime: payloadData.deadline_datetime || payloadData.deadlineDatetime || dbRow.deadline_datetime || "",
-                deadlineDatetime: payloadData.deadline_datetime || payloadData.deadlineDatetime || dbRow.deadline_datetime || "",
-                custom_questions: payloadData.custom_questions || payloadData.customQuestions || [],
-                customQuestions: payloadData.custom_questions || payloadData.customQuestions || []
-            };
-            setSessionCachedData('recruitment_settings', result);
-            return result;
-        } catch(e) { return null; }
+    // 2. RECRUITMENT SETTINGS
+    async getRecruitment() {
+        const staticRec = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.recruitment) || {
+            active: true,
+            title: "Grandeur Recruitment Drive 2026",
+            description: "Join the premier Consulting & Knowledge Cell of SSCBS.",
+            deadline: "August 20, 2026",
+            deadline_datetime: "",
+            custom_questions: []
+        };
+        return getLocalStore('recruitment_settings', staticRec);
     },
 
     async updateRecruitment(data) {
-        try {
-            let currentPayload = (await getSupabaseCMSPayload()) || {};
-            const existingRec = currentPayload.recruitment || {};
-
-            const updatedRec = {
-                id: 1,
-                active: data.active !== undefined ? (data.active === true || data.active === 'true') : (existingRec.active === true || existingRec.active === 'true'),
-                title: data.title !== undefined ? data.title : (existingRec.title || "Grandeur Recruitment Drive 2026"),
-                description: data.description !== undefined ? data.description : (existingRec.description || "Join the premier Consulting & Knowledge Cell of SSCBS."),
-                deadline: data.deadline !== undefined ? data.deadline : (existingRec.deadline || "August 20, 2026"),
-                deadline_datetime: data.deadline_datetime || data.deadlineDatetime || existingRec.deadline_datetime || existingRec.deadlineDatetime || "",
-                deadlineDatetime: data.deadline_datetime || data.deadlineDatetime || existingRec.deadline_datetime || existingRec.deadlineDatetime || "",
-                custom_questions: data.custom_questions || data.customQuestions || existingRec.custom_questions || existingRec.customQuestions || [],
-                customQuestions: data.custom_questions || data.customQuestions || existingRec.custom_questions || existingRec.customQuestions || []
-            };
-
-            currentPayload.recruitment = updatedRec;
-
-            const patchBody = {
-                active: updatedRec.active,
-                title: updatedRec.title,
-                description: updatedRec.description,
-                deadline: updatedRec.deadline,
-                form_url: JSON.stringify(currentPayload)
-            };
-
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?id=eq.1`, {
-                method: 'PATCH',
-                headers: { ...READ_HEADERS, 'Prefer': 'return=minimal' },
-                body: JSON.stringify(patchBody)
-            });
-
-            window.GrandeurDB.clearCache();
-            window.dispatchEvent(new Event('grandeur_store_updated'));
-            return res.ok;
-        } catch(e) {
-            console.warn("updateRecruitment error:", e);
-            return false;
-        }
+        const current = await this.getRecruitment();
+        const updated = { ...current, ...data };
+        setLocalStore('recruitment_settings', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
+        return true;
     },
 
     // 3. ANNOUNCEMENTS / BANNER
-    async getBanner(bypassCache = false) {
-        if (!bypassCache) {
-            const cached = getSessionCachedData('announcements');
-            if (cached !== null) return cached;
-        }
-        try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/announcements?select=id,text,link,active,created_at`, { headers: READ_HEADERS });
-            if (!res.ok) return null;
-            const rows = await res.json();
-            const result = rows.length > 0 ? rows[0] : null;
-            setSessionCachedData('announcements', result);
-            return result;
-        } catch(e) { return null; }
+    async getBanner() {
+        return getLocalStore('announcements', { id: 1, active: false, text: '', link: '' });
     },
 
     async updateBanner(data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/announcements`, {
-            method: 'POST',
-            headers: { ...WRITE_HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-            body: JSON.stringify({ id: 1, ...data })
-        });
-        window.GrandeurDB.clearCache();
-        return res.ok;
+        setLocalStore('announcements', data);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
+        return true;
     },
 
     // 4. KNOWLEDGE PRIMERS / PUBLICATIONS
-    async getKnowledgePrimers(bypassCache = false) {
-        if (!bypassCache) {
-            const cached = getSessionCachedData('knowledge_primers');
-            if (cached && Array.isArray(cached)) return cached;
-        }
-        try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?select=id,title,category,date_label,read_time,pdf_url,created_at&order=created_at.desc`, { headers: READ_HEADERS });
-            if (!res.ok) return [];
-            const rows = await res.json();
-            const sorted = sortPrimersByYearDesc(rows);
-            setSessionCachedData('knowledge_primers', sorted);
-            return sorted;
-        } catch(e) { return []; }
+    async getKnowledgePrimers() {
+        const staticPrimers = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.primers) || [];
+        const list = getLocalStore('knowledge_primers', staticPrimers);
+        return sortPrimersByYearDesc(list);
     },
 
     async insertKnowledgePrimer(data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers`, {
-            method: 'POST',
-            headers: WRITE_HEADERS,
-            body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        window.GrandeurDB.clearCache();
+        const list = await this.getKnowledgePrimers();
+        const newItem = { id: 'kp_' + Date.now(), created_at: new Date().toISOString(), ...data };
+        const updated = [newItem, ...list];
+        setLocalStore('knowledge_primers', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return true;
     },
 
     async updateKnowledgePrimer(id, data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?id=eq.${id}`, {
-            method: 'PATCH',
-            headers: WRITE_HEADERS,
-            body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        window.GrandeurDB.clearCache();
+        const list = await this.getKnowledgePrimers();
+        const updated = list.map(item => String(item.id) === String(id) ? { ...item, ...data } : item);
+        setLocalStore('knowledge_primers', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return true;
     },
 
     async deleteKnowledgePrimer(id) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?id=eq.${id}`, {
-            method: 'DELETE',
-            headers: WRITE_HEADERS
-        });
-        window.GrandeurDB.clearCache();
-        return res.ok;
+        const list = await this.getKnowledgePrimers();
+        const updated = list.filter(item => String(item.id) !== String(id));
+        setLocalStore('knowledge_primers', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
+        return true;
     },
 
     // 5. ACHIEVEMENTS
-    async getAchievements(bypassCache = false) {
-        if (!bypassCache) {
-            const cached = getSessionCachedData('achievements');
-            if (cached && Array.isArray(cached)) return cached;
-        }
-        try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?select=id,event_name,position,year,team_name,created_at&order=created_at.desc`, { headers: READ_HEADERS });
-            if (!res.ok) return [];
-            const rows = await res.json();
-            setSessionCachedData('achievements', rows);
-            return rows;
-        } catch(e) { return []; }
+    async getAchievements() {
+        const staticAch = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.achievements) || [];
+        return getLocalStore('achievements', staticAch);
     },
 
     async insertAchievement(data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements`, {
-            method: 'POST',
-            headers: WRITE_HEADERS,
-            body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        window.GrandeurDB.clearCache();
+        const list = await this.getAchievements();
+        const newItem = { id: 'ach_' + Date.now(), created_at: new Date().toISOString(), ...data };
+        const updated = [newItem, ...list];
+        setLocalStore('achievements', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return true;
     },
 
     async updateAchievement(id, data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?id=eq.${id}`, {
-            method: 'PATCH',
-            headers: WRITE_HEADERS,
-            body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        window.GrandeurDB.clearCache();
+        const list = await this.getAchievements();
+        const updated = list.map(item => String(item.id) === String(id) ? { ...item, ...data } : item);
+        setLocalStore('achievements', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return true;
     },
 
     async deleteAchievement(id) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?id=eq.${id}`, {
-            method: 'DELETE',
-            headers: WRITE_HEADERS
-        });
-        window.GrandeurDB.clearCache();
-        return res.ok;
+        const list = await this.getAchievements();
+        const updated = list.filter(item => String(item.id) !== String(id));
+        setLocalStore('achievements', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
+        return true;
     },
 
     // 6. CONTACT INQUIRIES (INBOX)
-    async getContactInquiries(bypassCache = false) {
-        if (!bypassCache) {
-            const cached = getSessionCachedData('contact_inquiries');
-            if (cached && Array.isArray(cached)) return cached;
-        }
-        try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries?select=id,name,email,subject,message,created_at&order=created_at.desc`, { headers: READ_HEADERS });
-            if (!res.ok) return [];
-            const rows = await res.json();
-            setSessionCachedData('contact_inquiries', rows);
-            return rows;
-        } catch(e) { return []; }
+    async getContactInquiries() {
+        return getLocalStore('contact_inquiries', []);
     },
 
     async insertContactInquiry(data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries`, {
-            method: 'POST',
-            headers: WRITE_HEADERS,
-            body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        window.GrandeurDB.clearCache();
+        const list = await this.getContactInquiries();
+        const newItem = { id: 'inq_' + Date.now(), created_at: new Date().toISOString(), ...data };
+        const updated = [newItem, ...list];
+        setLocalStore('contact_inquiries', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return true;
     },
 
     async deleteContactInquiry(id) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries?id=eq.${id}`, {
-            method: 'DELETE',
-            headers: WRITE_HEADERS
-        });
-        window.GrandeurDB.clearCache();
-        return res.ok;
+        const list = await this.getContactInquiries();
+        const updated = list.filter(item => String(item.id) !== String(id));
+        setLocalStore('contact_inquiries', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
+        return true;
     },
 
-    // 7. ALUMNI MEMBERS (Alumni Only)
-    async getAlumniMembers(bypassCache = false) {
-        if (!bypassCache) {
-            const cached = getSessionCachedData('alumni_members');
-            if (cached && Array.isArray(cached)) return cached;
-        }
-        try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=id,name,role,tier,photo,linkedin&role=ilike.*batch%20of*&order=created_at.asc`, { headers: READ_HEADERS });
-            if (!res.ok) return [];
-            const rows = await res.json();
-            const filtered = (rows || []).filter(m => m.role && m.role.toLowerCase().includes('batch of'));
-            setSessionCachedData('alumni_members', filtered);
-            return filtered;
-        } catch(e) { return []; }
+    // 7. ALUMNI MEMBERS
+    async getAlumniMembers() {
+        const staticAlumni = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.alumniMembers) || [];
+        return getLocalStore('alumni_members', staticAlumni);
     },
 
     async insertAlumniMember(data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members`, {
-            method: 'POST',
-            headers: WRITE_HEADERS,
-            body: JSON.stringify({ ...data, tier: 'board' })
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        window.GrandeurDB.clearCache();
+        const list = await this.getAlumniMembers();
+        const newItem = { id: 'alm_' + Date.now(), created_at: new Date().toISOString(), ...data, tier: 'board' };
+        const updated = [newItem, ...list];
+        setLocalStore('alumni_members', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return true;
     },
 
     async updateAlumniMember(id, data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?id=eq.${id}`, {
-            method: 'PATCH',
-            headers: WRITE_HEADERS,
-            body: JSON.stringify({ ...data, tier: 'board' })
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        window.GrandeurDB.clearCache();
+        const list = await this.getAlumniMembers();
+        const updated = list.map(item => String(item.id) === String(id) ? { ...item, ...data, tier: 'board' } : item);
+        setLocalStore('alumni_members', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return true;
     },
 
     async deleteAlumniMember(id) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?id=eq.${id}`, {
-            method: 'DELETE',
-            headers: WRITE_HEADERS
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        window.GrandeurDB.clearCache();
+        const list = await this.getAlumniMembers();
+        const updated = list.filter(item => String(item.id) !== String(id));
+        setLocalStore('alumni_members', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return true;
     },
 
     // 8. RECRUITMENT APPLICATIONS
-    async getRecruitmentApplications(bypassCache = false) {
-        if (!bypassCache) {
-            const cached = getSessionCachedData('recruitment_applications');
-            if (cached && Array.isArray(cached)) return cached;
-        }
-        try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_applications?select=id,full_name,email,phone,course,year,team_preference,answers,created_at&order=created_at.desc`, { headers: READ_HEADERS });
-            if (!res.ok) return [];
-            const rows = await res.json();
-            setSessionCachedData('recruitment_applications', rows);
-            return rows;
-        } catch(e) { return []; }
+    async getRecruitmentApplications() {
+        return getLocalStore('recruitment_applications', []);
     },
 
     async insertRecruitmentApplication(data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_applications`, {
-            method: 'POST',
-            headers: WRITE_HEADERS,
-            body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        window.GrandeurDB.clearCache();
+        const list = await this.getRecruitmentApplications();
+        const newItem = { id: 'app_' + Date.now(), created_at: new Date().toISOString(), ...data };
+        const updated = [newItem, ...list];
+        setLocalStore('recruitment_applications', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
         return true;
     },
 
     async deleteRecruitmentApplication(id) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_applications?id=eq.${id}`, {
-            method: 'DELETE',
-            headers: WRITE_HEADERS
-        });
-        window.GrandeurDB.clearCache();
-        return res.ok;
+        const list = await this.getRecruitmentApplications();
+        const updated = list.filter(item => String(item.id) !== String(id));
+        setLocalStore('recruitment_applications', updated);
+        window.dispatchEvent(new Event('grandeur_store_updated'));
+        return true;
     },
 
-    // 9. LIVE PROJECTS & UNIVERSAL CROSS-DEVICE SYNC ENGINE
+    // 9. LIVE PROJECTS
     async getLiveProjects() {
-        const sanitize = arr => Array.isArray(arr) ? arr.filter(p => p && p.title !== 'axis' && p.domain_tag !== 'AXIS' && p.id !== 'lp_axis') : null;
-
-        const cached = sanitize(getSessionCachedData('live_projects'));
-        if (cached && cached.length > 0) return cached;
-
-        try {
-            const cmsPayload = await getSupabaseCMSPayload();
-            if (cmsPayload && Array.isArray(cmsPayload.live_projects)) {
-                const cleaned = sanitize(cmsPayload.live_projects);
-                if (cleaned && cleaned.length > 0) {
-                    setSessionCachedData('live_projects', cleaned);
-                    try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(cleaned)); } catch(e) {}
-                    return cleaned;
-                }
-            }
-        } catch(e) {}
-
-        // Fallback to local storage
-        try {
-            const local = localStorage.getItem('gdb_fallback_live_projects');
-            if (local) {
-                const parsed = sanitize(JSON.parse(local));
-                if (parsed && parsed.length > 0) return parsed;
-            }
-        } catch(e) {}
-
-        return [
-            {
-                id: 'lp_honasa',
-                title: 'Honasa Consumers (Mamaearth)',
-                logo: 'collab-honasa.png',
-                domain_tag: 'Research',
-                description: 'Researched consumer behaviour, branding, and GTM strategies to enable successful D2C market entry.'
-            },
-            {
-                id: 'lp_krafton',
-                title: 'KRAFTON',
-                logo: 'collab-krafton.png',
-                domain_tag: 'Strategy and Research',
-                description: 'Conducted gaming market research, behavioural segmentation, and benchmarking to inform growth strategies.'
-            },
-            { id: 'lp_3', title: 'Melting Pot', domain_tag: 'SEO & AI Content Strategy', description: 'Produced 100+ SEO optimised blogs through thorough research and AI integration.' },
-            { id: 'lp_4', title: 'HDFC', domain_tag: 'Digital Channels & Insurance', description: 'Analysis of Adoption of Emerging Online Premium Collection Channels for HDFC Life Insurance Co. Ltd.' },
-            { id: 'lp_5', title: 'Yes Bank', domain_tag: 'Real Estate & Financial Feasibility', description: 'Conducted in depth feasibility & profitability analysis of an India-focused Real Estate Investment Trust.' },
-            { id: 'lp_6', title: 'Ken Research', domain_tag: 'Retail Finance & Benchmarking', description: 'Conducted warehousing & retail finance analysis using statistical tools for competitive benchmarking.' }, { id: 'lp_7', title: 'Unstop', domain_tag: 'Placement & Student Engagement', description: 'Planned to engage non-engineering students and strategized college placement drives.' },
-            { id: 'lp_8', title: 'Medulance', domain_tag: 'B2B Expansion & GTM Strategy', description: 'Designed GTM strategies for new corporate services, planned B2B expansion, and built client databases.' },
-            { id: 'lp_9', title: 'Meteor Ventures', domain_tag: 'Strategic Partnerships & Marketing', description: 'Researched on Similar companies, managed strategic tie-ups and trackers, and led marketing.' },
-            { id: 'lp_10', title: 'Unmay', domain_tag: 'Market Sizing & Competitor Analysis', description: 'Developed GTM, marketing, market sizing, and competitor analysis to expand Unmay’s business.' },
-            { id: 'lp_11', title: 'Catalyst IQ', domain_tag: 'HR Tech Market Research', description: 'HR tech market research in India and globally, covering products, startups to guide investments.' },
-            { id: 'lp_12', title: 'Hobbeeme', domain_tag: 'Customer Acquisition & Vendor Growth', description: 'Developed customer acquisition, branding and vendor growth strategies for UAE-based hobby marketplace through research and analysis.' }
-        ];
+        const staticLp = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.liveProjects) || [];
+        return getLocalStore('live_projects', staticLp);
     },
 
     async insertLiveProject(data) {
-        let success = false;
-        try {
-            const current = await this.getLiveProjects();
-            const newItem = { id: data.id || ('lp_' + Date.now()), created_at: new Date().toISOString(), ...data };
-            const updated = [newItem, ...current.filter(i => String(i.id) !== String(newItem.id))];
-            
-            success = await updateSupabaseCMSPayload({ live_projects: updated });
-            try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(updated)); } catch(e) {}
-        } catch(e) {}
-
-        window.GrandeurDB.clearCache();
+        const list = await this.getLiveProjects();
+        const newItem = { id: 'lp_' + Date.now(), created_at: new Date().toISOString(), ...data };
+        const updated = [newItem, ...list];
+        setLocalStore('live_projects', updated);
         window.dispatchEvent(new Event('grandeur_store_updated'));
-        return success;
+        return true;
     },
 
     async updateLiveProject(id, data) {
-        let success = false;
-        try {
-            const current = await this.getLiveProjects();
-            const updated = current.map(item => String(item.id) === String(id) ? { ...item, ...data } : item);
-            
-            success = await updateSupabaseCMSPayload({ live_projects: updated });
-            try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(updated)); } catch(e) {}
-        } catch(e) {}
-
-        window.GrandeurDB.clearCache();
+        const list = await this.getLiveProjects();
+        const updated = list.map(item => String(item.id) === String(id) ? { ...item, ...data } : item);
+        setLocalStore('live_projects', updated);
         window.dispatchEvent(new Event('grandeur_store_updated'));
-        return success;
+        return true;
     },
 
     async deleteLiveProject(id) {
-        let success = false;
-        try {
-            const current = await this.getLiveProjects();
-            const updated = current.filter(item => String(item.id) !== String(id));
-            
-            success = await updateSupabaseCMSPayload({ live_projects: updated });
-            try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(updated)); } catch(e) {}
-        } catch(e) {}
-
-        window.GrandeurDB.clearCache();
+        const list = await this.getLiveProjects();
+        const updated = list.filter(item => String(item.id) !== String(id));
+        setLocalStore('live_projects', updated);
         window.dispatchEvent(new Event('grandeur_store_updated'));
-        return success;
+        return true;
     },
 
-    // 10. EVENTS (WHAT WE DO) CRUD & FALLBACK ENGINE
+    // 10. EVENTS
     async getEvents() {
-        const cached = getSessionCachedData('events');
-        if (cached && Array.isArray(cached) && cached.length > 0) return cached;
-        
-        const DEFAULT_EVENTS = [
-            {
-                id: 'invicta',
-                title: 'INVICTA',
-                tagline: 'Flagship Case Competition',
-                description: "Grandeur's premier national case study competition bringing together sharp business minds from across top universities to solve complex corporate and strategic challenges.",
-                slides: [
-                    { image: 'invicta-1.jpg', badge: 'Annual Flagship Event', title: "INVICTA '26", sub: 'National Case Competition' },
-                    { image: 'invicta-2.jpg', badge: 'Annual Flagship Event', title: '1,500+ Participants', sub: 'Top B-Schools & DU Circuit' },
-                    { image: 'invicta-1.jpg', badge: 'Annual Flagship Event', title: 'Cash Prizes & Goodies', sub: 'Evaluated by Industry Experts' }
-                ]
-            },
-            {
-                id: 'echelon',
-                title: 'Echelon',
-                tagline: 'The Simulation Challenge',
-                description: 'An annual summit featuring keynote addresses from partner consultants, interactive strategy workshops, and high-impact corporate networking for aspiring business strategists.',
-                slides: [
-                    { image: 'echelon-1.jpg', badge: 'Crescendo Event', title: 'ECHELON', sub: 'Strategic Leadership Convention' },
-                    { image: 'echelon-2.jpg', badge: 'Crescendo Event', title: 'Industry Stalwarts', sub: 'Leaders from MBB & Big4' },
-                    { image: 'echelon-1.jpg', badge: 'Crescendo Event', title: 'Executive Mixers', sub: 'Connect with Industry Mentors' }
-                ]
-            },
-            {
-                id: 'ranneeti',
-                title: 'Ranneeti',
-                tagline: 'Intra-College Direct PI Competition',
-                description: 'The premier strategy battleground designed to hone analytical thinking, GTM formulation, and presentation skills through live corporate case simulations and peer challenges.',
-                slides: [
-                    { image: '', gradient: 'gradient-ranneeti-1', badge: 'Pre-Recruitment Event', title: 'RANNEETI', sub: 'Intra-College Strategy Battle' },
-                    { image: '', gradient: 'gradient-ranneeti-2', badge: 'Pre-Recruitment Event', title: 'Market Entry Pitch', sub: 'Real-World Case Simulations' },
-                    { image: '', gradient: 'gradient-ranneeti-3', badge: 'Pre-Recruitment Event', title: '1-on-1 Feedback', sub: 'Guidance from Senior Consultants' }
-                ]
-            }
-        ];
-
-        try {
-            const cmsPayload = await getSupabaseCMSPayload();
-            if (cmsPayload && Array.isArray(cmsPayload.events) && cmsPayload.events.length > 0) {
-                setSessionCachedData('events', cmsPayload.events);
-                try { localStorage.setItem('gdb_fallback_events', JSON.stringify(cmsPayload.events)); } catch(e) {}
-                return cmsPayload.events;
-            }
-        } catch(e) {}
-
-        // Fallback to Local Storage
-        try {
-            const local = localStorage.getItem('gdb_fallback_events');
-            if (local) {
-                const parsed = JSON.parse(local);
-                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-            }
-        } catch(e) {}
-
-        return DEFAULT_EVENTS;
+        const staticEvents = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.events) || [];
+        return getLocalStore('events', staticEvents);
     },
 
     async updateEvents(data) {
-        let success = false;
-        const payloadStr = JSON.stringify(data);
-
-        try {
-            success = await updateSupabaseCMSPayload({ events: data });
-        } catch(e) {}
-
-        try {
-            localStorage.setItem('gdb_fallback_events', payloadStr);
-            const store = JSON.parse(localStorage.getItem('grandeur_admin_store') || '{}');
-            store.events = data;
-            localStorage.setItem('grandeur_admin_store', JSON.stringify(store));
-        } catch(e) {}
-
-        window.GrandeurDB.clearCache();
+        setLocalStore('events', data);
         window.dispatchEvent(new Event('grandeur_store_updated'));
-        return success;
+        return true;
     }
 };
 
-// Global Supabase CMS Payload Engine Helpers
-let inFlightCMSPromise = null;
-async function getSupabaseCMSPayload() {
-    if (inFlightCMSPromise) return inFlightCMSPromise;
-    inFlightCMSPromise = (async () => {
-        try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=form_url&id=eq.1`, { 
-                headers: { ...READ_HEADERS, 'Cache-Control': 'no-cache' } 
-            });
-            if (res.ok) {
-                const rows = await res.json();
-                if (rows && rows.length > 0 && rows[0].form_url) {
-                    try {
-                        let parsed = typeof rows[0].form_url === 'string' ? JSON.parse(rows[0].form_url) : rows[0].form_url;
-                        if (typeof parsed === 'string') parsed = JSON.parse(parsed);
-                        if (parsed && typeof parsed === 'object') return parsed;
-                    } catch(e) {}
-                }
-            }
-        } catch(e) {} finally {
-            inFlightCMSPromise = null;
-        }
-        return null;
-    })();
-    return inFlightCMSPromise;
-}
-
-async function updateSupabaseCMSPayload(storeUpdate) {
-    try {
-        let currentStore = (await getSupabaseCMSPayload()) || {};
-        const updatedStore = { ...currentStore, ...storeUpdate };
-        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-        const timeoutId = controller ? setTimeout(() => controller.abort(), 10000) : null;
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?id=eq.1`, {
-            method: 'PATCH',
-            headers: { ...WRITE_HEADERS, 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ form_url: JSON.stringify(updatedStore) }),
-            signal: controller ? controller.signal : undefined
-        });
-        if (timeoutId) clearTimeout(timeoutId);
-        return res.ok;
-    } catch(e) {
-        return false;
-    }
-}
-
-console.log("⚡ GrandeurDB Optimized Egress Engine loaded!");
-
-
-
+console.log("⚡ Grandeur Static Local Data Engine loaded (0 External DB Dependencies)");

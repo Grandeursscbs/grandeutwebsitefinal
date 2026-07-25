@@ -36,7 +36,7 @@
                 <img src="logo-white.png" alt="Grandeur Logo" class="loader-logo">
             </div>
             <h3 class="loader-title">Grandeur Management Console</h3>
-            <p id="loader-status-text">⚡ Connecting to Grandeur Supabase DB...</p>
+            <p id="loader-status-text">⚡ Loading Grandeur Management Console...</p>
             <div class="loader-track">
                 <div class="loader-bar" id="loader-bar-fill"></div>
             </div>
@@ -147,7 +147,7 @@
                     
                     <div class="sidebar-footer-info">
                         <p><strong>Grandeur CMS v1.0</strong></p>
-                        <small>Supabase Connector Ready</small>
+                        <small>Static CMS Engine Ready</small>
                     </div>
                 </aside>
 
@@ -384,7 +384,7 @@
                             <p>Review and clear inquiries sent via the website <em>Contact Us</em> page.</p>
                             <ul>
                                 <li>📧 <strong>Responding:</strong> Click candidate or corporate email links directly to open your mail client and reply.</li>
-                                <li>⚠️ <strong>Storage Cleanup Warning:</strong> To maintain database speed and avoid Supabase tier storage limits, please click <strong>🗑️ Delete Inquiry</strong> once an inquiry has been addressed or resolved.</li>
+                                <li>⚠️ <strong>Storage Cleanup Warning:</strong> To keep your inbox clean and organized, please click <strong>🗑️ Delete Inquiry</strong> once an inquiry has been addressed or resolved.</li>
                             </ul>
                         </div>
 
@@ -879,7 +879,8 @@
     <!-- TOAST NOTIFICATION CONTAINER -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- Supabase JS Client & Configuration -->
+    <!-- Static Data & Configuration -->
+    <script src="static-data.js?v=1"></script>
     <script src="supabase-config.js?v=40"></script>
     <script src="admin.js?v=40"></script>
 </body>

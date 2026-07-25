@@ -329,7 +329,8 @@
         </div>
     </footer>
 
-    <!-- Supabase JS Client & Configuration -->
+    <!-- Static Data & Configuration -->
+    <script src="static-data.js?v=1"></script>
     <script src="supabase-config.js?v=36"></script>
     <script src="script.js?v=36"></script>
     <script>
@@ -337,11 +338,12 @@
             const container = document.getElementById('live-projects-container');
             if (!container) return;
 
-            let projects = [];
-            if (window.GrandeurDB && typeof window.GrandeurDB.getLiveProjects === 'function') {
+            let projects = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.liveProjects) || [];
+            if (window.GrandeurDB) {
                 try {
-                    projects = await window.GrandeurDB.getLiveProjects();
-                } catch(e) { console.error("Error loading live projects from GrandeurDB:", e); }
+                    const fetched = await window.GrandeurDB.getLiveProjects();
+                    if (Array.isArray(fetched) && fetched.length > 0) projects = fetched;
+                } catch(e) {}
             }
 
             if (window.renderDynamicLiveProjects) {

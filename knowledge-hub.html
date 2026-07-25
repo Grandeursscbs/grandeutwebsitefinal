@@ -146,39 +146,17 @@
                         }
 
                         try {
-                            let data = [];
+                            let data = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.primers) || [];
                             if (window.GrandeurDB) {
-                                data = await window.GrandeurDB.getKnowledgePrimers();
+                                try {
+                                    const fetched = await window.GrandeurDB.getKnowledgePrimers();
+                                    if (Array.isArray(fetched) && fetched.length > 0) data = fetched;
+                                } catch(e) {}
                             }
-                            if (!Array.isArray(data) || data.length === 0) {
-                                const res = await fetch('https://mtycgxndnaxdusqsvqqs.supabase.co/rest/v1/knowledge_primers?select=id,title,category,date_label,read_time,pdf_url,created_at&order=created_at.desc', {
-                                    headers: {
-                                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs',
-                                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNneG5kbmF4ZHVzcXN2cXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NDU1MDgsImV4cCI6MjEwMDAyMTUwOH0._9CsDcumHsowYMTmzTh-SMcSM9ZexoB7dFhgBsCrNxs'
-                                    }
-                                });
-                                if (res.ok) data = await res.json();
-                            }
-                            function sortPrimersByYearDesc(list) {
-                                return (list || []).sort((a, b) => {
-                                    const extractYear = (p) => {
-                                        const str = String(p.date_label || p.year || '');
-                                        const match = str.match(/\b(20\d\d|19\d\d)\b/);
-                                        if (match) return parseInt(match[1], 10);
-                                        return p.created_at ? new Date(p.created_at).getFullYear() : 0;
-                                    };
-                                    const yearA = extractYear(a);
-                                    const yearB = extractYear(b);
-                                    if (yearB !== yearA) return yearB - yearA;
-                                    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
-                                    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
-                                    return timeB - timeA;
-                                });
-                            }
-
                             if (Array.isArray(data)) {
                                 allPrimers = sortPrimersByYearDesc(data);
                                 renderPrimersGrid(allPrimers);
+                            }
                             }
                         } catch(e) {
                             console.error("Knowledge Hub load error:", e);
@@ -233,7 +211,8 @@
         </div>
     </footer>
 
-    <!-- Supabase JS Client & Configuration -->
+    <!-- Static Data & Configuration -->
+    <script src="static-data.js?v=1"></script>
     <script src="supabase-config.js?v=26"></script>
     <script src="script.js?v=26"></script>
 </body>
