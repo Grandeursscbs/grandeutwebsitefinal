@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const closeMenu = () => {
             navLinks.classList.remove('active');
             menuToggle.classList.remove('active');
+            document.body.classList.remove('menu-open');
             const spans = menuToggle.querySelectorAll('span');
             if (spans.length >= 3) {
                 spans[0].style.transform = 'none';
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         menuToggle.addEventListener('click', () => {
             navLinks.classList.toggle('active');
             menuToggle.classList.toggle('active');
+            document.body.classList.toggle('menu-open');
             const spans = menuToggle.querySelectorAll('span');
             if (spans.length >= 3) {
                 if (menuToggle.classList.contains('active')) {
@@ -293,6 +295,9 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', () => {
                 resourceFilterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
+                if (window.innerWidth <= 768) {
+                    button.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
                 filterResources();
             });
         });
@@ -333,6 +338,9 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', () => {
                 alumniFilterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
+                if (window.innerWidth <= 768) {
+                    button.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
                 filterAlumni();
             });
         });

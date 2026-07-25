@@ -1208,13 +1208,47 @@ a {
     }
 }
 
+/* Responsive Breakpoints & Mobile Optimization */
+body.menu-open {
+    overflow: hidden !important;
+}
+
+@media (max-width: 1080px) and (min-width: 769px) {
+    .nav-container {
+        padding: 1rem 1.5rem;
+    }
+    .nav-links {
+        gap: 1.25rem;
+    }
+    .nav-link {
+        font-size: 0.88rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .contact-split {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
+}
+
 @media (max-width: 768px) {
     .section-container {
         padding: 0 1.25rem;
     }
 
     .grid, .stats-grid, .values-grid {
-        gap: 1.75rem !important;
+        gap: 1.5rem !important;
     }
 
     .grid-2, .grid-3, .grid-4 {
@@ -1226,11 +1260,15 @@ a {
     }
     
     .section {
-        padding: 3.5rem 1rem;
+        padding: 3rem 1rem;
     }
     
     .section-header {
         margin-bottom: 2rem;
+    }
+    
+    .section-header h2 {
+        font-size: clamp(1.5rem, 5vw, 2rem);
     }
     
     .nav-container {
@@ -1238,7 +1276,7 @@ a {
     }
     
     .logo-img {
-        height: 38px;
+        height: 36px;
     }
     
     .main-content {
@@ -1247,12 +1285,20 @@ a {
     
     .hero-home {
         min-height: calc(100vh - 60px);
-        padding: 4rem 1rem;
+        padding: 3.5rem 1rem;
     }
     
     .hero {
-        padding: 3.5rem 1.25rem 3rem;
-        min-height: 32vh;
+        padding: 3.25rem 1.25rem 2.5rem;
+        min-height: auto;
+    }
+    
+    .hero h1 {
+        font-size: clamp(1.75rem, 6vw, 2.35rem);
+    }
+    
+    .hero p {
+        font-size: 0.98rem;
     }
     
     .nav-links {
@@ -1265,16 +1311,17 @@ a {
         background: rgba(15, 29, 58, 0.98);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
-        padding: 0 2rem;
+        padding: 0 1.5rem;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
         border-top: 1px solid rgba(255, 255, 255, 0.1);
-        gap: 1.15rem;
+        gap: 1rem;
         align-items: flex-start;
         opacity: 0;
         visibility: hidden;
         transform: translateY(-10px);
         max-height: 0;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease, padding 0.3s ease;
         z-index: 999;
     }
@@ -1283,14 +1330,14 @@ a {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
-        max-height: calc(100vh - 65px);
-        padding: 1.5rem 2rem 2rem;
+        max-height: calc(100vh - 60px);
+        padding: 1.25rem 1.5rem 2.25rem;
     }
     
     .nav-links .nav-link {
-        color: rgba(255, 255, 255, 0.85);
+        color: rgba(255, 255, 255, 0.9);
         width: 100%;
-        padding: 0.5rem 0;
+        padding: 0.6rem 0;
         font-size: 1.05rem;
     }
     
@@ -1302,8 +1349,57 @@ a {
         background: var(--accent-yellow);
     }
     
+    /* CTA button styling in mobile menu drawer */
+    .nav-links .nav-link-btn {
+        background: linear-gradient(135deg, #FBC523 0%, #f59e0b 100%) !important;
+        color: #0f1d3a !important;
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+        padding: 0.75rem 1.5rem !important;
+        font-size: 0.98rem !important;
+        border: none !important;
+        box-shadow: 0 4px 14px rgba(251, 197, 35, 0.35) !important;
+    }
+    
+    .nav-links .nav-link-btn:hover {
+        background: linear-gradient(135deg, #ffffff 0%, #FBC523 100%) !important;
+        color: #0f1d3a !important;
+    }
+    
     .menu-toggle {
         display: flex;
+    }
+    
+    /* Mobile Horizontally Scrollable Filter Buttons */
+    .filter-container {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.65rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        flex-wrap: nowrap;
+        padding: 0.5rem 0.25rem 0.75rem;
+        margin-bottom: 2rem;
+        width: 100%;
+    }
+    
+    .filter-container::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .filter-btn {
+        white-space: nowrap;
+        flex-shrink: 0;
+        padding: 0.45rem 1.1rem;
+        font-size: 0.88rem;
+    }
+    
+    .search-bar {
+        max-width: 100%;
+        margin-bottom: 2rem;
     }
     
     .timeline::after {
@@ -1328,7 +1424,7 @@ a {
     
     .footer-container {
         grid-template-columns: 1fr;
-        gap: 2.5rem;
+        gap: 2.25rem;
         text-align: center;
     }
     
@@ -1347,45 +1443,35 @@ a {
     }
     
     .contact-form-container {
-        padding: 1.75rem 1.25rem;
+        padding: 1.5rem 1.25rem;
     }
     
     /* Collaborator cards marquee scaling */
     .collab-card {
-        min-width: 210px;
-        height: 180px;
-        padding: 1.5rem 1.25rem;
-        margin: 0 0.65rem;
-        gap: 1rem;
+        min-width: 190px;
+        height: 165px;
+        padding: 1.25rem 1rem;
+        margin: 0 0.5rem;
+        gap: 0.85rem;
     }
     
     .collab-logo-wrapper {
-        height: 80px;
+        height: 70px;
     }
     
     .collab-logo {
-        height: 70px;
-        width: 70px;
-    }
-    
-    .collab-logo.mamaearth {
-        height: 45px;
-        width: 45px;
-    }
-    
-    .collab-logo.honasa {
         height: 60px;
         width: 60px;
     }
     
     .collab-name {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
     }
     
     /* Slider Mobile Improvements */
     .slider-container {
         min-height: auto;
-        margin: 1.5rem auto;
+        margin: 1.25rem auto;
     }
 
     .achieve-slide {
@@ -1394,60 +1480,86 @@ a {
 
     .slide-img-container {
         width: 100% !important;
-        height: 220px !important;
+        height: 200px !important;
     }
 
     .slide-text-container {
         width: 100% !important;
-        padding: 1.5rem 1.25rem 3.25rem !important;
+        padding: 1.25rem 1rem 3rem !important;
     }
 
     .slide-text-container h3 {
-        font-size: 1.35rem;
+        font-size: 1.25rem;
     }
 
     .slide-text-container .slide-inst {
-        font-size: 0.95rem;
-        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        margin-bottom: 0.65rem;
     }
 
     .slider-btn {
-        width: 38px;
-        height: 38px;
-        font-size: 1rem;
-        top: 110px;
+        width: 36px;
+        height: 36px;
+        font-size: 0.95rem;
+        top: 100px;
         transform: translateY(-50%);
     }
     
     .slider-btn.prev {
-        left: 0.75rem;
+        left: 0.5rem;
     }
     
     .slider-btn.next {
-        right: 0.75rem;
+        right: 0.5rem;
     }
     
     .slider-dots {
-        bottom: 1rem;
+        bottom: 0.85rem;
         right: 50%;
         transform: translateX(50%);
+    }
+    
+    /* Event Carousel Mobile */
+    .event-carousel {
+        height: 210px;
+    }
+    
+    .event-card-content {
+        padding: 1.35rem 1.25rem;
+    }
+    
+    .event-card-title {
+        font-size: 1.35rem;
     }
 }
 
 @media (max-width: 576px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 1.5rem 0.75rem !important;
+        gap: 1.25rem 0.75rem !important;
     }
     .stat-number {
-        font-size: 2.35rem !important;
+        font-size: 2.1rem !important;
     }
     .stat-label {
-        font-size: 0.85rem !important;
+        font-size: 0.82rem !important;
     }
 }
 
 @media (max-width: 480px) {
+    .nav-container {
+        padding: 0.65rem 1rem;
+    }
+    .logo-img {
+        height: 32px;
+    }
+    .logo-text .brand-name {
+        font-size: 1.05rem;
+    }
+    .logo-text .branch-name {
+        font-size: 0.65rem;
+        letter-spacing: 0.5px;
+    }
     .hero-buttons {
         flex-direction: column;
         width: 100%;
@@ -1456,7 +1568,34 @@ a {
         width: 100%;
     }
     .card {
-        padding: 1.5rem 1.25rem;
+        padding: 1.25rem 1rem;
+    }
+    .collab-card {
+        min-width: 165px;
+        height: 150px;
+        padding: 1rem 0.75rem;
+    }
+    .collab-logo-wrapper {
+        height: 60px;
+    }
+    .collab-logo {
+        height: 50px;
+        width: 50px;
+    }
+    .event-carousel {
+        height: 195px;
+    }
+}
+
+@media (max-width: 360px) {
+    .logo-text .brand-name {
+        font-size: 0.95rem;
+    }
+    .logo-text .branch-name {
+        font-size: 0.6rem;
+    }
+    .hero h1 {
+        font-size: 1.6rem;
     }
 }
 
