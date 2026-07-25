@@ -946,13 +946,25 @@ window.GRANDEUR_STATIC_DATA = {
       "id": "echelon",
       "title": "Echelon",
       "tagline": "The Simulation Challenge",
-      "description": "An annual summit featuring keynote addresses from partner consultants, interactive strategy workshops, and high-impact corporate networking for aspiring business strategists.",
+      "description": "An immersive strategy simulation where participants tackle dynamic business challenges, make high-stakes strategic decisions, and experience the complexities of corporate decision-making in a competitive environment.",
       "slides": [
         {
+          "image": "echelon-1.jpg",
+          "badge": "",
+          "title": "",
+          "sub": ""
+        },
+        {
           "image": "echelon-2.jpg",
-          "badge": "Crescendo Event",
-          "title": "Industry Stalwarts",
-          "sub": "Leaders from MBB & Big4"
+          "badge": "",
+          "title": "",
+          "sub": ""
+        },
+        {
+          "image": "echelon-3.jpg",
+          "badge": "",
+          "title": "",
+          "sub": ""
         }
       ]
     },
