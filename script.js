@@ -1034,12 +1034,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (img) {
                     return `
                         <div class="event-slide">
-                            <img src="${img}" alt="${slideTitle}">
-                            <div class="event-slide-overlay">
-                                ${badge ? `<span class="event-slide-badge">${badge}</span>` : ''}
-                                ${slideTitle ? `<h4 class="slide-title">${slideTitle}</h4>` : ''}
-                                ${slideSub ? `<p class="slide-sub">${slideSub}</p>` : ''}
-                            </div>
+                            <img src="${img}" alt="${slideTitle || 'Event Slide'}">
                         </div>
                     `;
                 } else {
@@ -1051,11 +1046,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <circle cx="200" cy="100" r="90" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" />
                                     <circle cx="200" cy="100" r="40" fill="rgba(255,255,255,0.1)" />
                                 </svg>
-                                <div class="event-slide-overlay">
-                                    ${badge ? `<span class="event-slide-badge">${badge}</span>` : ''}
-                                    ${slideTitle ? `<h4 class="slide-title">${slideTitle}</h4>` : ''}
-                                    ${slideSub ? `<p class="slide-sub">${slideSub}</p>` : ''}
-                                </div>
                             </div>
                         </div>
                     `;
