@@ -244,6 +244,7 @@ function initAdminConsole() {
         }
         setTimeout(() => triggerTopProgress(100), 150);
     }
+    window.activateTab = activateTab;
 
     tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -362,15 +363,17 @@ function initAdminConsole() {
         triggerTopProgress(progressPercent);
         const loader = document.getElementById('admin-global-loader');
         if (loader) {
+            loader.classList.add('active');
             loader.style.display = 'flex';
             loader.style.opacity = '1';
+            loader.style.visibility = 'visible';
             loader.style.pointerEvents = 'all';
         }
         updateAdminLoader(statusText, progressPercent);
         if (loaderSafetyTimeout) clearTimeout(loaderSafetyTimeout);
         loaderSafetyTimeout = setTimeout(() => {
             hideAdminLoader();
-        }, 6000);
+        }, 5000);
     }
 
     function updateAdminLoader(statusText, progressPercent) {
@@ -389,14 +392,14 @@ function initAdminConsole() {
         }
         const loader = document.getElementById('admin-global-loader');
         if (loader) {
-            updateAdminLoader('Ready!', 100);
-            setTimeout(() => {
-                loader.style.opacity = '0';
-                loader.style.pointerEvents = 'none';
-                setTimeout(() => { loader.style.display = 'none'; }, 400);
-            }, 300);
+            loader.classList.remove('active');
+            loader.style.opacity = '0';
+            loader.style.pointerEvents = 'none';
+            loader.style.visibility = 'hidden';
+            loader.style.display = 'none';
         }
     }
+    window.hideAdminLoader = hideAdminLoader;
 
     async function renderDashboard() {
         showAdminLoader('⚡ Syncing Grandeur CMS Database Modules...', 30);
