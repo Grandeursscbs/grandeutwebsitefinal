@@ -19,15 +19,24 @@ const WRITE_HEADERS = {
     'Prefer': 'return=minimal'
 };
 
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes session TTL
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes session & memory cache TTL
+const gdbMemoryCache = new Map();
 
 function getSessionCachedData(key) {
     try {
+        if (gdbMemoryCache.has(key)) {
+            const cached = gdbMemoryCache.get(key);
+            if (Date.now() - cached.timestamp < CACHE_TTL_MS) {
+                return cached.data;
+            }
+            gdbMemoryCache.delete(key);
+        }
         if (typeof window === 'undefined' || !window.sessionStorage) return null;
         const raw = window.sessionStorage.getItem('gdb_cache_' + key);
         if (!raw) return null;
         const parsed = JSON.parse(raw);
         if (Date.now() - parsed.timestamp < CACHE_TTL_MS) {
+            gdbMemoryCache.set(key, parsed);
             return parsed.data;
         }
     } catch(e) {}
@@ -36,6 +45,7 @@ function getSessionCachedData(key) {
 
 function setSessionCachedData(key, data) {
     try {
+        gdbMemoryCache.set(key, { timestamp: Date.now(), data: data });
         if (typeof window !== 'undefined' && window.sessionStorage) {
             window.sessionStorage.setItem('gdb_cache_' + key, JSON.stringify({
                 timestamp: Date.now(),
@@ -65,6 +75,7 @@ function sortPrimersByYearDesc(primers) {
 window.GrandeurDB = {
     clearCache() {
         try {
+            gdbMemoryCache.clear();
             ['sessionStorage', 'localStorage'].forEach(st => {
                 const store = window[st];
                 if (store) {
@@ -77,11 +88,17 @@ window.GrandeurDB = {
     },
 
     // 1. TEAM MEMBERS CRUD (Current Team Only)
-    async getTeamMembers() {
+    async getTeamMembers(bypassCache = false) {
+        if (!bypassCache) {
+            const cached = getSessionCachedData('team_members');
+            if (cached && Array.isArray(cached)) return cached;
+        }
         const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=id,name,role,tier,photo,linkedin&role=not.ilike.*batch%20of*&order=created_at.asc`, { headers: READ_HEADERS });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
         const rows = await res.json();
-        return (rows || []).filter(m => !m.role || !m.role.toLowerCase().includes('batch of'));
+        const filtered = (rows || []).filter(m => !m.role || !m.role.toLowerCase().includes('batch of'));
+        setSessionCachedData('team_members', filtered);
+        return filtered;
     },
 
     async insertTeamMember(data) {
@@ -117,7 +134,11 @@ window.GrandeurDB = {
     },
 
     // 2. RECRUITMENT SETTINGS (Global Cloud Sync)
-    async getRecruitment() {
+    async getRecruitment(bypassCache = false) {
+        if (!bypassCache) {
+            const cached = getSessionCachedData('recruitment_settings');
+            if (cached) return cached;
+        }
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=*&id=eq.1`, { headers: READ_HEADERS });
             if (!res.ok) return null;
@@ -135,7 +156,7 @@ window.GrandeurDB = {
                 } catch(e) {}
             }
 
-            return {
+            const result = {
                 id: 1,
                 active: dbRow.active !== undefined ? (dbRow.active === true || dbRow.active === 'true') : (payloadData.active === true || payloadData.active === 'true'),
                 title: dbRow.title || payloadData.title || "Grandeur Recruitment Drive 2026",
@@ -146,6 +167,8 @@ window.GrandeurDB = {
                 custom_questions: payloadData.custom_questions || payloadData.customQuestions || [],
                 customQuestions: payloadData.custom_questions || payloadData.customQuestions || []
             };
+            setSessionCachedData('recruitment_settings', result);
+            return result;
         } catch(e) { return null; }
     },
 
@@ -192,12 +215,18 @@ window.GrandeurDB = {
     },
 
     // 3. ANNOUNCEMENTS / BANNER
-    async getBanner() {
+    async getBanner(bypassCache = false) {
+        if (!bypassCache) {
+            const cached = getSessionCachedData('announcements');
+            if (cached !== null) return cached;
+        }
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/announcements?select=id,text,link,active,created_at`, { headers: READ_HEADERS });
             if (!res.ok) return null;
             const rows = await res.json();
-            return rows.length > 0 ? rows[0] : null;
+            const result = rows.length > 0 ? rows[0] : null;
+            setSessionCachedData('announcements', result);
+            return result;
         } catch(e) { return null; }
     },
 
@@ -212,12 +241,18 @@ window.GrandeurDB = {
     },
 
     // 4. KNOWLEDGE PRIMERS / PUBLICATIONS
-    async getKnowledgePrimers() {
+    async getKnowledgePrimers(bypassCache = false) {
+        if (!bypassCache) {
+            const cached = getSessionCachedData('knowledge_primers');
+            if (cached && Array.isArray(cached)) return cached;
+        }
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/knowledge_primers?select=id,title,category,date_label,read_time,pdf_url,created_at&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
             const rows = await res.json();
-            return sortPrimersByYearDesc(rows);
+            const sorted = sortPrimersByYearDesc(rows);
+            setSessionCachedData('knowledge_primers', sorted);
+            return sorted;
         } catch(e) { return []; }
     },
 
@@ -253,11 +288,17 @@ window.GrandeurDB = {
     },
 
     // 5. ACHIEVEMENTS
-    async getAchievements() {
+    async getAchievements(bypassCache = false) {
+        if (!bypassCache) {
+            const cached = getSessionCachedData('achievements');
+            if (cached && Array.isArray(cached)) return cached;
+        }
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/achievements?select=id,event_name,position,year,team_name,created_at&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
-            return await res.json();
+            const rows = await res.json();
+            setSessionCachedData('achievements', rows);
+            return rows;
         } catch(e) { return []; }
     },
 
@@ -293,11 +334,17 @@ window.GrandeurDB = {
     },
 
     // 6. CONTACT INQUIRIES (INBOX)
-    async getContactInquiries() {
+    async getContactInquiries(bypassCache = false) {
+        if (!bypassCache) {
+            const cached = getSessionCachedData('contact_inquiries');
+            if (cached && Array.isArray(cached)) return cached;
+        }
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries?select=id,name,email,subject,message,created_at&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
-            return await res.json();
+            const rows = await res.json();
+            setSessionCachedData('contact_inquiries', rows);
+            return rows;
         } catch(e) { return []; }
     },
 
@@ -308,6 +355,7 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        window.GrandeurDB.clearCache();
         return true;
     },
 
@@ -316,16 +364,23 @@ window.GrandeurDB = {
             method: 'DELETE',
             headers: WRITE_HEADERS
         });
+        window.GrandeurDB.clearCache();
         return res.ok;
     },
 
     // 7. ALUMNI MEMBERS (Alumni Only)
-    async getAlumniMembers() {
+    async getAlumniMembers(bypassCache = false) {
+        if (!bypassCache) {
+            const cached = getSessionCachedData('alumni_members');
+            if (cached && Array.isArray(cached)) return cached;
+        }
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/team_members?select=id,name,role,tier,photo,linkedin&role=ilike.*batch%20of*&order=created_at.asc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
             const rows = await res.json();
-            return (rows || []).filter(m => m.role && m.role.toLowerCase().includes('batch of'));
+            const filtered = (rows || []).filter(m => m.role && m.role.toLowerCase().includes('batch of'));
+            setSessionCachedData('alumni_members', filtered);
+            return filtered;
         } catch(e) { return []; }
     },
 
@@ -362,11 +417,17 @@ window.GrandeurDB = {
     },
 
     // 8. RECRUITMENT APPLICATIONS
-    async getRecruitmentApplications() {
+    async getRecruitmentApplications(bypassCache = false) {
+        if (!bypassCache) {
+            const cached = getSessionCachedData('recruitment_applications');
+            if (cached && Array.isArray(cached)) return cached;
+        }
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_applications?select=id,full_name,email,phone,course,year,team_preference,answers,created_at&order=created_at.desc`, { headers: READ_HEADERS });
             if (!res.ok) return [];
-            return await res.json();
+            const rows = await res.json();
+            setSessionCachedData('recruitment_applications', rows);
+            return rows;
         } catch(e) { return []; }
     },
 
@@ -377,6 +438,7 @@ window.GrandeurDB = {
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        window.GrandeurDB.clearCache();
         return true;
     },
 
@@ -385,6 +447,7 @@ window.GrandeurDB = {
             method: 'DELETE',
             headers: WRITE_HEADERS
         });
+        window.GrandeurDB.clearCache();
         return res.ok;
     },
 

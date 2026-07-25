@@ -805,10 +805,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else {
                             if (height > maxDim) { width *= maxDim / height; height = maxDim; }
                         }
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
+                        canvas.width = Math.round(width);
+                        canvas.height = Math.round(height);
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
                         if (photoHiddenInput) photoHiddenInput.value = compressedBase64;
                         updatePhotoPreview(compressedBase64);
                         showToast(`✅ Photo optimized (${(compressedBase64.length / 1024).toFixed(0)}KB)`);
@@ -1252,13 +1252,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         let height = img.height;
                         if (width > height) {
                             if (width > maxDim) { height *= maxDim / width; width = maxDim; }
+                        const maxDim = 350;
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > height) {
+                            if (width > maxDim) { height *= maxDim / width; width = maxDim; }
                         } else {
                             if (height > maxDim) { width *= maxDim / height; height = maxDim; }
                         }
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
+                        canvas.width = Math.round(width);
+                        canvas.height = Math.round(height);
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
                         if (alumniPhotoInput) alumniPhotoInput.value = compressedBase64;
                         if (alumniPhotoPreviewImg) {
                             alumniPhotoPreviewImg.src = compressedBase64;
@@ -1472,18 +1477,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else {
                             width = Math.round((width * maxDim) / height);
                             height = maxDim;
-                        }
+                    const maxDim = 250;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) { height *= maxDim / width; width = maxDim; }
+                        else { width *= maxDim / height; height = maxDim; }
                     }
 
-                    canvas.width = width;
-                    canvas.height = height;
+                    canvas.width = Math.round(width);
+                    canvas.height = Math.round(height);
                     const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-                    const compressedBase64 = canvas.toDataURL('image/png', 0.85);
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
                     if (logoHiddenInput) logoHiddenInput.value = compressedBase64;
                     updateLogoPreview(compressedBase64);
-                    showToast(`✅ Logo optimized!`);
+                    showToast(`✅ Logo optimized (${(compressedBase64.length / 1024).toFixed(0)}KB)`);
                 };
                 img.src = event.target.result;
             };
@@ -1893,15 +1903,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
+                    const maxDim = 250;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) { height *= maxDim / width; width = maxDim; }
+                        else { width *= maxDim / height; height = maxDim; }
+                    }
 
-                    const compressedBase64 = canvas.toDataURL('image/png');
+                    canvas.width = Math.round(width);
+                    canvas.height = Math.round(height);
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
                     if (lpLogoHiddenInput) lpLogoHiddenInput.value = compressedBase64;
                     updateLpLogoPreview(compressedBase64);
-                    showToast(`✅ Logo optimized!`);
+                    showToast(`✅ Logo optimized (${(compressedBase64.length / 1024).toFixed(0)}KB)`);
                 };
                 img.src = event.target.result;
             };
@@ -2203,16 +2221,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const reader = new FileReader();
         reader.onload = function(e) {
-            const dataUrl = e.target.result;
-            const card = inputEl.closest('.event-slide-item-card');
-            if (card) {
-                const imgInput = card.querySelector('.slide-input-image');
-                const previewBox = card.querySelector('.slide-img-preview');
-                if (imgInput) imgInput.value = dataUrl;
-                if (previewBox) {
-                    previewBox.innerHTML = `<img src="${dataUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const maxDim = 800;
+                let width = img.width;
+                let height = img.height;
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) { height *= maxDim / width; width = maxDim; }
+                    else { width *= maxDim / height; height = maxDim; }
                 }
-            }
+                canvas.width = Math.round(width);
+                canvas.height = Math.round(height);
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
+
+                const card = inputEl.closest('.event-slide-item-card');
+                if (card) {
+                    const imgInput = card.querySelector('.slide-input-image');
+                    const previewBox = card.querySelector('.slide-img-preview');
+                    if (imgInput) imgInput.value = compressedBase64;
+                    if (previewBox) {
+                        previewBox.innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; object-fit:cover;">`;
+                    }
+                }
+            };
+            img.src = e.target.result;
         };
         reader.readAsDataURL(file);
     };
