@@ -167,9 +167,8 @@ function initAdminConsole() {
                 if (dv) dv.style.display = 'block';
                 if (ua) ua.style.display = 'flex';
 
-        window.doAdminLogin = doAdminLogin;
-        checkAuthSession();
-    } else {
+                checkAuthSession();
+            } else {
                 const errAlert = document.getElementById('auth-error');
                 if (errAlert) {
                     errAlert.textContent = "⚠️ Invalid passcode. Access denied.";
@@ -188,6 +187,8 @@ function initAdminConsole() {
             }
         }
     }
+
+    window.doAdminLogin = doAdminLogin;
 
     if (loginForm) {
         loginForm.addEventListener('submit', doAdminLogin);
