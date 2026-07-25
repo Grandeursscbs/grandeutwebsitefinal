@@ -847,6 +847,7 @@ window.GRANDEUR_STATIC_DATA = {
     {
       "id": "lp_3",
       "title": "Melting Pot",
+      "logo": "collab-meltingpot.png",
       "domain_tag": "SEO & AI Content Strategy",
       "description": "Produced 100+ SEO optimised blogs through thorough research and AI integration."
     },
