@@ -248,10 +248,19 @@ window.GrandeurDB = {
         return true;
     },
 
-    // 9. LIVE PROJECTS
     async getLiveProjects() {
         const staticLp = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.liveProjects) || [];
-        return getLocalStore('live_projects', staticLp);
+        const local = getLocalStore('live_projects', staticLp);
+        if (Array.isArray(local)) {
+            return local.map(item => {
+                const match = staticLp.find(s => String(s.id) === String(item.id) || (item.title && s.title && String(s.title).toLowerCase() === String(item.title).toLowerCase()));
+                if (match && match.logo && !item.logo) {
+                    return { ...item, logo: match.logo };
+                }
+                return item;
+            });
+        }
+        return staticLp;
     },
 
     async insertLiveProject(data) {

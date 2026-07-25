@@ -962,6 +962,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.renderDynamicAchievements = renderDynamicAchievements;
 
+    const LP_DEFAULT_LOGOS = {
+        'lp_honasa': 'collab-honasa.png',
+        'lp_krafton': 'collab-krafton.png',
+        'lp_3': 'collab-meltingpot.png',
+        'lp_4': 'collab-hdfc.png',
+        'lp_5': 'collab-yesbank.png',
+        'lp_6': 'collab-kenresearch.png',
+        'lp_7': 'collab-unstop.png',
+        'lp_8': 'collab-medulance.png',
+        'lp_9': 'collab-meteor.png',
+        'lp_10': 'collab-unmay.png',
+        'lp_11': 'collab-catalystiq.png',
+        'lp_12': 'collab-hobbeeme.png'
+    };
+
+    const LP_TITLE_LOGOS = {
+        'honasa': 'collab-honasa.png',
+        'mamaearth': 'collab-honasa.png',
+        'krafton': 'collab-krafton.png',
+        'melting': 'collab-meltingpot.png',
+        'hdfc': 'collab-hdfc.png',
+        'yes bank': 'collab-yesbank.png',
+        'ken research': 'collab-kenresearch.png',
+        'unstop': 'collab-unstop.png',
+        'medulance': 'collab-medulance.png',
+        'meteor': 'collab-meteor.png',
+        'unmay': 'collab-unmay.png',
+        'catalyst': 'collab-catalystiq.png',
+        'hobbeeme': 'collab-hobbeeme.png'
+    };
+
     function renderDynamicLiveProjects(projectsList, container) {
         if (!container) return;
         if (!projectsList || projectsList.length === 0) {
@@ -977,7 +1008,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const title = escapeHtml(item.title || item.client_name || '');
             const domainTag = escapeHtml(item.domain_tag || 'Consulting');
             const description = escapeHtml(item.description || '');
-            const logo = item.logo || item.client_logo || '';
+
+            let logo = item.logo || item.client_logo || '';
+            if (!logo) {
+                if (item.id && LP_DEFAULT_LOGOS[item.id]) {
+                    logo = LP_DEFAULT_LOGOS[item.id];
+                } else {
+                    const titleLower = (item.title || item.client_name || '').toLowerCase();
+                    for (const [key, val] of Object.entries(LP_TITLE_LOGOS)) {
+                        if (titleLower.includes(key)) {
+                            logo = val;
+                            break;
+                        }
+                    }
+                }
+            }
 
             const avatarHtml = logo 
                 ? `<div class="lp-client-logo"><img src="${logo}" alt="${title}"></div>`
@@ -989,8 +1034,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="lp-client-badge">
                             ${avatarHtml}
                         </div>
-                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem;">
-                            <span class="lp-domain-tag">${domainTag}</span>
+                        <div class="lp-domain-wrapper">
+                            <span class="lp-domain-tag" title="${domainTag}">${domainTag}</span>
                         </div>
                     </div>
                     <h3>${title}</h3>
