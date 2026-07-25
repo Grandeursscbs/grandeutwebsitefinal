@@ -11,8 +11,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="stylesheet" href="style.css?v=30">
-    <link rel="stylesheet" href="admin.css?v=30">
+    <link rel="stylesheet" href="style.css?v=35">
+    <link rel="stylesheet" href="admin.css?v=35">
     <!-- Vercel Web Analytics -->
     <script>
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -250,7 +250,7 @@
                                 <h1>Team Members Manager</h1>
                                 <p>Add, update, reorder, or remove team members across all organizational tiers.</p>
                             </div>
-                            <button class="btn btn-primary" id="btn-open-add-member-modal">➕ Add New Member</button>
+                            <button class="btn btn-primary" id="btn-open-add-member-modal" onclick="if(window.openMemberModal)window.openMemberModal()">➕ Add New Member</button>
                         </div>
 
                         <!-- Filter Bar -->
@@ -300,7 +300,7 @@
                                 <h1>Knowledge Hub & Primers</h1>
                                 <p>Manage research publications, sector primers, and consulting frameworks.</p>
                             </div>
-                            <button class="btn btn-primary" id="btn-open-add-primer-modal">➕ Add New Primer</button>
+                            <button class="btn btn-primary" id="btn-open-add-primer-modal" onclick="if(window.openPrimerModal)window.openPrimerModal()">➕ Add New Primer</button>
                         </div>
 
                         <div class="admin-card">
@@ -330,7 +330,7 @@
                                 <h1>Achievements & Competition Victories</h1>
                                 <p>Manage case fest podium finishes and national competitive awards.</p>
                             </div>
-                            <button class="btn btn-primary" id="btn-open-add-achievement-modal">➕ Add Achievement</button>
+                            <button class="btn btn-primary" id="btn-open-add-achievement-modal" onclick="if(window.openAchievementModal)window.openAchievementModal()">➕ Add Achievement</button>
                         </div>
 
                         <div class="admin-card">
@@ -389,7 +389,7 @@
                                 <h1>Alumni Network Management</h1>
                                 <p>Add, edit, or remove past members displayed on the Wall of Alumni.</p>
                             </div>
-                            <button class="btn btn-primary" id="btn-open-add-alumni-modal">➕ Add Alumni Member</button>
+                            <button class="btn btn-primary" id="btn-open-add-alumni-modal" onclick="if(window.openAlumniModal)window.openAlumniModal()">➕ Add Alumni Member</button>
                         </div>
 
                         <div class="admin-card">
@@ -418,7 +418,7 @@
                                 <h1>Live Projects Management</h1>
                                 <p>Add, edit, or remove corporate consulting live projects displayed on the "What We Do" page.</p>
                             </div>
-                            <button class="btn btn-primary" id="btn-open-add-live-project-modal">➕ Add Live Project</button>
+                            <button class="btn btn-primary" id="btn-open-add-live-project-modal" onclick="if(window.openLiveProjectModal)window.openLiveProjectModal()">➕ Add Live Project</button>
                         </div>
 
                         <!-- GUIDE & INSTRUCTIONS: LIVE PROJECTS -->
@@ -867,7 +867,7 @@
     <div id="toast-container" class="toast-container"></div>
 
     <!-- Supabase JS Client & Configuration -->
-    <script src="supabase-config.js?v=30"></script>
-    <script src="admin.js?v=30"></script>
+    <script src="supabase-config.js?v=35"></script>
+    <script src="admin.js?v=35"></script>
 </body>
 </html>

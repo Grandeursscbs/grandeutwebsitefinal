@@ -58,7 +58,7 @@ body.admin-body {
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
-    pointer-events: none;
+    pointer-events: none !important;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -66,9 +66,9 @@ body.admin-body {
 
 #admin-global-loader.active {
     display: flex !important;
-    pointer-events: all !important;
     opacity: 1 !important;
     visibility: visible !important;
+    pointer-events: none !important;
 }
 
 .loader-card {

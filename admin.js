@@ -920,9 +920,10 @@ function initAdminConsole() {
         modalMember.style.display = 'flex';
     }
 
-    function closeMemberModal() {
-        if (modalMember) modalMember.style.display = 'none';
-    }
+    window.openMemberModal = openMemberModal;
+    window.closeMemberModal = closeMemberModal;
+    window.editMember = editMember;
+    window.deleteMember = deleteMember;
 
     if (btnOpenAddMember) btnOpenAddMember.addEventListener('click', () => openMemberModal());
     if (quickAddMember) quickAddMember.addEventListener('click', () => {
