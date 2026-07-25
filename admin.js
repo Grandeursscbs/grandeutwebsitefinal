@@ -2,7 +2,7 @@
    Grandeur SSCBS - Admin Console JavaScript (Supabase Integrated)
    ========================================================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
+function initAdminConsole() {
     let cachedTeam = [];
     let cachedPrimers = [];
     let cachedAlumni = [];
@@ -167,8 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (dv) dv.style.display = 'block';
                 if (ua) ua.style.display = 'flex';
 
-                checkAuthSession();
-            } else {
+        window.doAdminLogin = doAdminLogin;
+        checkAuthSession();
+    } else {
                 const errAlert = document.getElementById('auth-error');
                 if (errAlert) {
                     errAlert.textContent = "⚠️ Invalid passcode. Access denied.";
@@ -2418,4 +2419,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     checkAuthSession();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminConsole);
+} else {
+    initAdminConsole();
+}

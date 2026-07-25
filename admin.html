@@ -68,7 +68,7 @@
                     <p>Enter the admin passcode to manage website content, recruitment drives, and cell members.</p>
                 </div>
 
-                <form id="admin-login-form" class="admin-auth-form">
+                <form id="admin-login-form" class="admin-auth-form" onsubmit="if (window.doAdminLogin) { window.doAdminLogin(event); return false; }">
                     <div class="form-group">
                         <label for="admin-passcode">Admin Passcode</label>
                         <div class="passcode-input-wrapper">
@@ -81,7 +81,7 @@
                         ⚠️ Invalid admin passcode. Please try again.
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block" id="btn-login">Sign In to Console</button>
+                    <button type="submit" class="btn btn-primary btn-block" id="btn-login" onclick="if (window.doAdminLogin) { window.doAdminLogin(event); }">Sign In to Console</button>
                 </form>
 
                 <script>
