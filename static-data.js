@@ -923,22 +923,10 @@ window.GRANDEUR_STATIC_DATA = {
       "description": "Grandeur's premier national case study competition bringing together sharp business minds from across top universities to solve complex corporate and strategic challenges.",
       "slides": [
         {
-          "image": "invicta-1.jpg",
-          "badge": "Annual Flagship Event",
-          "title": "INVICTA '26",
-          "sub": "National Case Competition"
-        },
-        {
           "image": "invicta-2.jpg",
           "badge": "Annual Flagship Event",
           "title": "1,500+ Participants",
           "sub": "Top B-Schools & DU Circuit"
-        },
-        {
-          "image": "invicta-1.jpg",
-          "badge": "Annual Flagship Event",
-          "title": "Cash Prizes & Goodies",
-          "sub": "Evaluated by Industry Experts"
         }
       ]
     },
@@ -949,22 +937,10 @@ window.GRANDEUR_STATIC_DATA = {
       "description": "An annual summit featuring keynote addresses from partner consultants, interactive strategy workshops, and high-impact corporate networking for aspiring business strategists.",
       "slides": [
         {
-          "image": "echelon-1.jpg",
-          "badge": "Crescendo Event",
-          "title": "ECHELON",
-          "sub": "Strategic Leadership Convention"
-        },
-        {
           "image": "echelon-2.jpg",
           "badge": "Crescendo Event",
           "title": "Industry Stalwarts",
           "sub": "Leaders from MBB & Big4"
-        },
-        {
-          "image": "echelon-1.jpg",
-          "badge": "Crescendo Event",
-          "title": "Executive Mixers",
-          "sub": "Connect with Industry Mentors"
         }
       ]
     },

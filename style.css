@@ -2150,8 +2150,9 @@ a.resources-badge:hover {
 
 .lp-client-logo {
     height: 52px;
-    min-width: 52px;
-    max-width: 130px;
+    width: 110px;
+    min-width: 110px;
+    max-width: 110px;
     border-radius: 12px;
     background: #ffffff;
     border: 1px solid var(--border, #e2e8f0);
@@ -2161,14 +2162,17 @@ a.resources-badge:hover {
     justify-content: center;
     box-shadow: 0 2px 10px rgba(15, 29, 58, 0.05);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 0;
+    overflow: hidden;
 }
 
 .lp-client-logo img {
     max-height: 40px;
-    max-width: 100%;
+    max-width: 90px;
     width: auto;
     height: auto;
     object-fit: contain;
+    display: block;
 }
 
 .lp-domain-tag {
@@ -2176,11 +2180,13 @@ a.resources-badge:hover {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    padding: 0.3rem 0.75rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 20px;
     background: rgba(var(--primary-rgb), 0.08);
     color: var(--primary);
     border: 1px solid rgba(var(--primary-rgb), 0.15);
+    white-space: nowrap;
+    text-align: right;
 }
 
 .lp-card h3 {
