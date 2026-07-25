@@ -544,31 +544,45 @@ window.GrandeurDB = {
 };
 
 // Global Supabase CMS Payload Engine Helpers
+let inFlightCMSPromise = null;
 async function getSupabaseCMSPayload() {
-    try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=form_url&id=eq.1`, { headers: READ_HEADERS });
-        if (res.ok) {
-            const rows = await res.json();
-            if (rows && rows.length > 0 && rows[0].form_url) {
-                try {
-                    const parsed = JSON.parse(rows[0].form_url);
-                    if (parsed && typeof parsed === 'object') return parsed;
-                } catch(e) {}
+    if (inFlightCMSPromise) return inFlightCMSPromise;
+    inFlightCMSPromise = (async () => {
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?select=form_url&id=eq.1`, { 
+                headers: { ...READ_HEADERS, 'Cache-Control': 'no-cache' } 
+            });
+            if (res.ok) {
+                const rows = await res.json();
+                if (rows && rows.length > 0 && rows[0].form_url) {
+                    try {
+                        let parsed = typeof rows[0].form_url === 'string' ? JSON.parse(rows[0].form_url) : rows[0].form_url;
+                        if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+                        if (parsed && typeof parsed === 'object') return parsed;
+                    } catch(e) {}
+                }
             }
+        } catch(e) {} finally {
+            inFlightCMSPromise = null;
         }
-    } catch(e) {}
-    return null;
+        return null;
+    })();
+    return inFlightCMSPromise;
 }
 
 async function updateSupabaseCMSPayload(storeUpdate) {
     try {
         let currentStore = (await getSupabaseCMSPayload()) || {};
         const updatedStore = { ...currentStore, ...storeUpdate };
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), 10000) : null;
         const res = await fetch(`${SUPABASE_URL}/rest/v1/recruitment_settings?id=eq.1`, {
             method: 'PATCH',
             headers: { ...WRITE_HEADERS, 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ form_url: JSON.stringify(updatedStore) })
+            body: JSON.stringify({ form_url: JSON.stringify(updatedStore) }),
+            signal: controller ? controller.signal : undefined
         });
+        if (timeoutId) clearTimeout(timeoutId);
         return res.ok;
     } catch(e) {
         return false;

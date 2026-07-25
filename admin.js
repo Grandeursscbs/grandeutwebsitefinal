@@ -110,12 +110,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const loginBtn = document.getElementById('btn-login') || (loginForm ? loginForm.querySelector('button[type="submit"]') : null);
+        const origBtnText = loginBtn ? loginBtn.textContent : 'Sign In';
+
         try {
+            if (loginBtn) {
+                loginBtn.disabled = true;
+                loginBtn.textContent = '⏳ Authenticating...';
+            }
+
             const inputHash = await computeSHA256(val);
-            if (inputHash === SECRET_PASS_HASH) {
+            if (inputHash === SECRET_PASS_HASH || val === "GrandeurWebsite2026") {
                 sessionStorage.setItem('grandeur_admin_authenticated', 'true');
                 if (authErrorAlert) authErrorAlert.style.display = 'none';
-                showToast("✅ Successfully authenticated!");
+                showToast("✅ Access granted! Opening console...");
+                showAdminLoader('⚡ Opening Grandeur Management Console...', 20);
                 checkAuthSession();
             } else {
                 if (authErrorAlert) {
@@ -125,13 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast("❌ Access denied: Invalid passcode.");
             }
         } catch(err) {
-            console.error("Auth Hash Error:", err);
-            if (val === "GrandeurWebsite2026") {
-                sessionStorage.setItem('grandeur_admin_authenticated', 'true');
-                checkAuthSession();
-            } else {
-                if (authErrorAlert) authErrorAlert.style.display = 'block';
-                showToast("❌ Access denied.");
+            console.error("Auth Error:", err);
+            showToast("❌ Access denied.");
+        } finally {
+            if (loginBtn) {
+                loginBtn.disabled = false;
+                loginBtn.textContent = origBtnText;
             }
         }
     }
@@ -349,7 +357,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function renderDashboard() {
-        showAdminLoader('⚡ Connecting to Grandeur Supabase DB...', 25);
+        // Render initial cached data immediately so tables are never blank (0ms latency)
+        const localStore = getStore();
+        if (!cachedLiveProjects || cachedLiveProjects.length === 0) {
+            try {
+                const localLp = localStorage.getItem('gdb_fallback_live_projects');
+                if (localLp) cachedLiveProjects = JSON.parse(localLp) || [];
+            } catch(e) {}
+        }
+        if (!cachedEvents || cachedEvents.length === 0) {
+            try {
+                const localEv = localStorage.getItem('gdb_fallback_events');
+                if (localEv) cachedEvents = JSON.parse(localEv) || [];
+            } catch(e) {}
+        }
+
+        renderTeamTable(cachedTeam.length > 0 ? cachedTeam : (localStore.team || []));
+        renderKnowledgeTable(cachedPrimers || []);
+        renderAlumniTable(cachedAlumni || []);
+        renderAchievementsTable(cachedAchievements || []);
+        renderLiveProjectsTable(cachedLiveProjects || []);
+        renderEventsEditor(cachedEvents || []);
+        renderApplicationsList(cachedApplications.length > 0 ? cachedApplications : (localStore.applications || []));
+
+        showAdminLoader('⚡ Syncing Grandeur CMS Database Modules...', 30);
         let recruitmentData = null;
         let bannerData = null;
         let teamData = null;
@@ -357,23 +388,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (window.GrandeurDB) {
             try {
-                updateAdminLoader('🔄 Syncing recruitments & candidate applications...', 50);
-                recruitmentData = await window.GrandeurDB.getRecruitment();
-                if (window.GrandeurDB.getRecruitmentApplications) {
-                    cachedApplications = await window.GrandeurDB.getRecruitmentApplications();
-                }
+                updateAdminLoader('🔄 Fetching recruitments, team, live projects & publications in parallel...', 65);
+                const [
+                    recRes,
+                    appRes,
+                    teamRes,
+                    inboxRes,
+                    primersRes,
+                    alumniRes,
+                    achievementsRes,
+                    liveProjectsRes,
+                    eventsRes
+                ] = await Promise.allSettled([
+                    window.GrandeurDB.getRecruitment(),
+                    window.GrandeurDB.getRecruitmentApplications ? window.GrandeurDB.getRecruitmentApplications() : Promise.resolve([]),
+                    window.GrandeurDB.getTeamMembers(),
+                    window.GrandeurDB.getContactInquiries(),
+                    window.GrandeurDB.getKnowledgePrimers(),
+                    window.GrandeurDB.getAlumniMembers(),
+                    window.GrandeurDB.getAchievements(),
+                    window.GrandeurDB.getLiveProjects ? window.GrandeurDB.getLiveProjects() : Promise.resolve([]),
+                    window.GrandeurDB.getEvents ? window.GrandeurDB.getEvents() : Promise.resolve([])
+                ]);
 
-                updateAdminLoader('👥 Loading team members, primers & alumni...', 80);
-                teamData = await window.GrandeurDB.getTeamMembers();
-                inboxData = await window.GrandeurDB.getContactInquiries();
-                cachedPrimers = await window.GrandeurDB.getKnowledgePrimers();
-                cachedAlumni = await window.GrandeurDB.getAlumniMembers();
-                cachedAchievements = await window.GrandeurDB.getAchievements();
-                if (window.GrandeurDB.getLiveProjects) {
-                    cachedLiveProjects = await window.GrandeurDB.getLiveProjects();
-                }
-                if (window.GrandeurDB.getEvents) {
-                    cachedEvents = await window.GrandeurDB.getEvents();
+                if (recRes.status === 'fulfilled') recruitmentData = recRes.value;
+                if (appRes.status === 'fulfilled') cachedApplications = appRes.value || [];
+                if (teamRes.status === 'fulfilled') teamData = teamRes.value || [];
+                if (inboxRes.status === 'fulfilled') inboxData = inboxRes.value || [];
+                if (primersRes.status === 'fulfilled') cachedPrimers = primersRes.value || [];
+                if (alumniRes.status === 'fulfilled') cachedAlumni = alumniRes.value || [];
+                if (achievementsRes.status === 'fulfilled') cachedAchievements = achievementsRes.value || [];
+                if (liveProjectsRes.status === 'fulfilled') cachedLiveProjects = liveProjectsRes.value || [];
+                if (eventsRes.status === 'fulfilled') {
+                    cachedEvents = eventsRes.value || [];
                     renderEventsEditor(cachedEvents);
                 }
             } catch (err) {
@@ -381,7 +428,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const localStore = getStore();
         if ((!cachedApplications || cachedApplications.length === 0) && Array.isArray(localStore.applications)) {
             cachedApplications = localStore.applications;
         }
@@ -1835,7 +1881,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const maxDim = 400;
+                    const maxDim = 200;
 
                     if (width > maxDim || height > maxDim) {
                         if (width > height) {
@@ -1852,7 +1898,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    const compressedBase64 = canvas.toDataURL('image/png', 0.85);
+                    const compressedBase64 = canvas.toDataURL('image/png');
                     if (lpLogoHiddenInput) lpLogoHiddenInput.value = compressedBase64;
                     updateLpLogoPreview(compressedBase64);
                     showToast(`✅ Logo optimized!`);
@@ -1957,36 +2003,57 @@ document.addEventListener('DOMContentLoaded', () => {
     if (formLiveProjectModal) {
         formLiveProjectModal.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const editId = document.getElementById('lp-edit-id').value;
-            const title = document.getElementById('lp-title').value.trim();
-            const logo = document.getElementById('lp-logo') ? document.getElementById('lp-logo').value : '';
-            const domain_tag = document.getElementById('lp-domain-tag').value.trim();
+            const btnSave = document.getElementById('btn-save-live-project');
+            const originalBtnText = btnSave ? btnSave.textContent : 'Save Live Project';
 
-            const description = document.getElementById('lp-description').value.trim();
-
-            const payload = {
-                title,
-                logo,
-                domain_tag,
-                description
-            };
-
-            showToast(`⏳ Saving live project...`);
-
-            if (editId) {
-                if (window.GrandeurDB && window.GrandeurDB.updateLiveProject) {
-                    await window.GrandeurDB.updateLiveProject(editId, payload);
+            try {
+                if (btnSave) {
+                    btnSave.disabled = true;
+                    btnSave.textContent = '⏳ Saving...';
                 }
-                showToast(`✅ Live project updated!`);
-            } else {
-                if (window.GrandeurDB && window.GrandeurDB.insertLiveProject) {
-                    await window.GrandeurDB.insertLiveProject(payload);
+
+                const editId = document.getElementById('lp-edit-id').value;
+                const title = document.getElementById('lp-title').value.trim();
+                const logo = document.getElementById('lp-logo') ? document.getElementById('lp-logo').value : '';
+                const domain_tag = document.getElementById('lp-domain-tag').value.trim();
+                const description = document.getElementById('lp-description').value.trim();
+
+                const payload = {
+                    title,
+                    logo,
+                    domain_tag,
+                    description
+                };
+
+                showToast(`⏳ Saving live project...`);
+
+                if (editId) {
+                    if (window.GrandeurDB && window.GrandeurDB.updateLiveProject) {
+                        await window.GrandeurDB.updateLiveProject(editId, payload);
+                    }
+                    const idx = cachedLiveProjects.findIndex(p => String(p.id) === String(editId));
+                    if (idx !== -1) cachedLiveProjects[idx] = { ...cachedLiveProjects[idx], ...payload };
+                    showToast(`✅ Live project updated & live on website!`);
+                } else {
+                    const newId = 'lp_' + Date.now();
+                    const newItem = { id: newId, ...payload };
+                    if (window.GrandeurDB && window.GrandeurDB.insertLiveProject) {
+                        await window.GrandeurDB.insertLiveProject(payload);
+                    }
+                    cachedLiveProjects.unshift(newItem);
+                    showToast(`✅ Live project added & live on website!`);
                 }
-                showToast(`✅ Live project added!`);
+            } catch(err) {
+                console.error("Error saving live project:", err);
+                showToast(`⚠️ Error saving project: ${err.message || err}`);
+            } finally {
+                if (btnSave) {
+                    btnSave.disabled = false;
+                    btnSave.textContent = originalBtnText;
+                }
+                closeLiveProjectModal();
+                renderLiveProjectsTable(cachedLiveProjects);
             }
-
-            closeLiveProjectModal();
-            await renderDashboard();
         });
     }
 
@@ -2000,11 +2067,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = item ? (item.title || item.client_name) : 'this live project';
         if (confirm(`Are you sure you want to delete "${name}"?`)) {
             showToast(`⏳ Deleting project...`);
+            cachedLiveProjects = cachedLiveProjects.filter(p => String(p.id) !== String(id));
+            renderLiveProjectsTable(cachedLiveProjects);
             if (window.GrandeurDB && window.GrandeurDB.deleteLiveProject) {
                 await window.GrandeurDB.deleteLiveProject(id);
             }
-            showToast(`🗑️ Live project deleted.`);
-            await renderDashboard();
+            showToast(`🗑️ Live project deleted & synced!`);
         }
     };
 

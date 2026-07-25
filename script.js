@@ -1011,6 +1011,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.renderDynamicLiveProjects = renderDynamicLiveProjects;
 
+    window.addEventListener('grandeur_store_updated', async () => {
+        const liveProjectsContainer = document.getElementById('live-projects-container');
+        if (liveProjectsContainer && window.GrandeurDB && typeof window.GrandeurDB.getLiveProjects === 'function') {
+            try {
+                const updatedProjects = await window.GrandeurDB.getLiveProjects();
+                renderDynamicLiveProjects(updatedProjects || [], liveProjectsContainer);
+            } catch(e) {}
+        }
+    });
+
     function renderDynamicEvents(eventsList, container) {
         if (!container) return;
         if (!Array.isArray(eventsList) || eventsList.length === 0) return;
