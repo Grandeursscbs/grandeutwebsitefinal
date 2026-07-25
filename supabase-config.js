@@ -458,15 +458,20 @@ window.GrandeurDB = {
 
     // 9. LIVE PROJECTS & UNIVERSAL CROSS-DEVICE SYNC ENGINE
     async getLiveProjects() {
-        const cached = getSessionCachedData('live_projects');
-        if (cached && Array.isArray(cached)) return cached;
+        const sanitize = arr => Array.isArray(arr) ? arr.filter(p => p && p.title !== 'axis' && p.domain_tag !== 'AXIS' && p.id !== 'lp_axis') : null;
+
+        const cached = sanitize(getSessionCachedData('live_projects'));
+        if (cached && cached.length > 0) return cached;
 
         try {
             const cmsPayload = await getSupabaseCMSPayload();
             if (cmsPayload && Array.isArray(cmsPayload.live_projects)) {
-                setSessionCachedData('live_projects', cmsPayload.live_projects);
-                try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(cmsPayload.live_projects)); } catch(e) {}
-                return cmsPayload.live_projects;
+                const cleaned = sanitize(cmsPayload.live_projects);
+                if (cleaned && cleaned.length > 0) {
+                    setSessionCachedData('live_projects', cleaned);
+                    try { localStorage.setItem('gdb_fallback_live_projects', JSON.stringify(cleaned)); } catch(e) {}
+                    return cleaned;
+                }
             }
         } catch(e) {}
 
@@ -474,12 +479,36 @@ window.GrandeurDB = {
         try {
             const local = localStorage.getItem('gdb_fallback_live_projects');
             if (local) {
-                const parsed = JSON.parse(local);
-                if (Array.isArray(parsed)) return parsed;
+                const parsed = sanitize(JSON.parse(local));
+                if (parsed && parsed.length > 0) return parsed;
             }
         } catch(e) {}
 
-        return [];
+        return [
+            {
+                id: 'lp_honasa',
+                title: 'Honasa Consumers (Mamaearth)',
+                logo: 'collab-honasa.png',
+                domain_tag: 'Research',
+                description: 'Researched consumer behaviour, branding, and GTM strategies to enable successful D2C market entry.'
+            },
+            {
+                id: 'lp_krafton',
+                title: 'KRAFTON',
+                logo: 'collab-krafton.png',
+                domain_tag: 'Strategy and Research',
+                description: 'Conducted gaming market research, behavioural segmentation, and benchmarking to inform growth strategies.'
+            },
+            { id: 'lp_3', title: 'Melting Pot', domain_tag: 'SEO & AI Content Strategy', description: 'Produced 100+ SEO optimised blogs through thorough research and AI integration.' },
+            { id: 'lp_4', title: 'HDFC', domain_tag: 'Digital Channels & Insurance', description: 'Analysis of Adoption of Emerging Online Premium Collection Channels for HDFC Life Insurance Co. Ltd.' },
+            { id: 'lp_5', title: 'Yes Bank', domain_tag: 'Real Estate & Financial Feasibility', description: 'Conducted in depth feasibility & profitability analysis of an India-focused Real Estate Investment Trust.' },
+            { id: 'lp_6', title: 'Ken Research', domain_tag: 'Retail Finance & Benchmarking', description: 'Conducted warehousing & retail finance analysis using statistical tools for competitive benchmarking.' }, { id: 'lp_7', title: 'Unstop', domain_tag: 'Placement & Student Engagement', description: 'Planned to engage non-engineering students and strategized college placement drives.' },
+            { id: 'lp_8', title: 'Medulance', domain_tag: 'B2B Expansion & GTM Strategy', description: 'Designed GTM strategies for new corporate services, planned B2B expansion, and built client databases.' },
+            { id: 'lp_9', title: 'Meteor Ventures', domain_tag: 'Strategic Partnerships & Marketing', description: 'Researched on Similar companies, managed strategic tie-ups and trackers, and led marketing.' },
+            { id: 'lp_10', title: 'Unmay', domain_tag: 'Market Sizing & Competitor Analysis', description: 'Developed GTM, marketing, market sizing, and competitor analysis to expand Unmay’s business.' },
+            { id: 'lp_11', title: 'Catalyst IQ', domain_tag: 'HR Tech Market Research', description: 'HR tech market research in India and globally, covering products, startups to guide investments.' },
+            { id: 'lp_12', title: 'Hobbeeme', domain_tag: 'Customer Acquisition & Vendor Growth', description: 'Developed customer acquisition, branding and vendor growth strategies for UAE-based hobby marketplace through research and analysis.' }
+        ];
     },
 
     async insertLiveProject(data) {
