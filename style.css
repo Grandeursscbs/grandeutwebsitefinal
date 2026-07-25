@@ -1014,53 +1014,94 @@ a {
     box-shadow: var(--shadow-md);
 }
 
-/* Embedded Contact Form (Google Form) Responsiveness */
+/* Embedded Contact Form (Google Form) Ultra-Responsive Scaling Wrapper */
 .contact-form-card {
-    padding: 0.75rem;
-    min-height: 760px;
+    padding: 0.5rem;
     width: 100%;
     background: #ffffff;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: var(--shadow-md);
     border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    position: relative;
+}
+
+.iframe-responsive-wrapper {
+    position: relative;
+    width: 100%;
+    height: 760px;
+    overflow: hidden;
+    border-radius: 12px;
 }
 
 .contact-form-iframe {
     width: 100%;
-    height: 780px !important;
-    min-height: 760px;
+    height: 760px !important;
     border: none;
-    border-radius: 12px;
     display: block;
+    transform-origin: 0 0;
 }
 
 @media (max-width: 768px) {
     .contact-form-card {
         padding: 0.25rem;
-        min-height: 860px;
         border-radius: 14px;
     }
+    .iframe-responsive-wrapper {
+        height: 820px;
+    }
     .contact-form-iframe {
-        height: 860px !important;
-        min-height: 840px;
-        border-radius: 10px;
+        width: 115% !important;
+        height: 940px !important;
+        transform: scale(0.87);
     }
 }
 
-@media (max-width: 480px) {
-    .contact-form-card {
-        padding: 0;
-        min-height: 920px;
-        border-radius: 12px;
+@media (max-width: 540px) {
+    .iframe-responsive-wrapper {
+        height: 830px;
     }
     .contact-form-iframe {
-        height: 920px !important;
-        min-height: 900px;
-        border-radius: 8px;
+        width: 128% !important;
+        height: 1060px !important;
+        transform: scale(0.78);
+    }
+}
+
+@media (max-width: 420px) {
+    .contact-form-card {
+        padding: 0;
+        border-radius: 12px;
+    }
+    .iframe-responsive-wrapper {
+        height: 840px;
+    }
+    .contact-form-iframe {
+        width: 139% !important;
+        height: 1160px !important;
+        transform: scale(0.72);
+    }
+}
+
+@media (max-width: 375px) {
+    .iframe-responsive-wrapper {
+        height: 850px;
+    }
+    .contact-form-iframe {
+        width: 152% !important;
+        height: 1280px !important;
+        transform: scale(0.66);
+    }
+}
+
+@media (max-width: 330px) {
+    .iframe-responsive-wrapper {
+        height: 860px;
+    }
+    .contact-form-iframe {
+        width: 167% !important;
+        height: 1430px !important;
+        transform: scale(0.60);
     }
 }
 
