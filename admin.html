@@ -95,6 +95,19 @@
                         if (lv) lv.style.display = 'flex';
                         if (dv) dv.style.display = 'none';
                         if (ua) ua.style.display = 'none';
+
+                        window.activateTab = function(tabId) {
+                            if (!tabId) return;
+                            const btns = document.querySelectorAll('.admin-nav-item');
+                            const panels = document.querySelectorAll('.tab-panel');
+                            btns.forEach(b => b.classList.remove('active'));
+                            panels.forEach(p => p.classList.remove('active'));
+                            const btn = document.querySelector(`.admin-nav-item[data-tab="${tabId}"]`);
+                            const panel = document.getElementById(tabId);
+                            if (btn) btn.classList.add('active');
+                            if (panel) panel.classList.add('active');
+                            try { localStorage.setItem('grandeur_admin_active_tab', tabId); } catch(e) {}
+                        };
                     })();
                 </script>
             </div>

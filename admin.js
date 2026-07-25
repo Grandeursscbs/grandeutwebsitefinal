@@ -231,26 +231,33 @@ function initAdminConsole() {
         const targetPanel = document.getElementById(tabId);
         if (!targetPanel) return;
 
-        tabButtons.forEach(b => b.classList.remove('active'));
-        tabPanels.forEach(p => p.classList.remove('active'));
+        const allButtons = document.querySelectorAll('.admin-nav-item');
+        const allPanels = document.querySelectorAll('.tab-panel');
+
+        allButtons.forEach(b => b.classList.remove('active'));
+        allPanels.forEach(p => p.classList.remove('active'));
 
         if (targetBtn) targetBtn.classList.add('active');
         targetPanel.classList.add('active');
         localStorage.setItem('grandeur_admin_active_tab', tabId);
-        if (history.replaceState) {
-            history.replaceState(null, null, '#' + tabId);
-        } else {
-            location.hash = tabId;
-        }
+        try {
+            if (history.replaceState) {
+                history.replaceState(null, null, '#' + tabId);
+            } else {
+                location.hash = tabId;
+            }
+        } catch(e) {}
         setTimeout(() => triggerTopProgress(100), 150);
     }
     window.activateTab = activateTab;
 
-    tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
+    // Delegated click listener to guarantee sidebar tabs always switch instantly
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.admin-nav-item');
+        if (btn) {
             const targetTab = btn.getAttribute('data-tab');
-            activateTab(targetTab);
-        });
+            if (targetTab) activateTab(targetTab);
+        }
     });
 
     function restoreActiveTab() {
@@ -373,7 +380,7 @@ function initAdminConsole() {
         if (loaderSafetyTimeout) clearTimeout(loaderSafetyTimeout);
         loaderSafetyTimeout = setTimeout(() => {
             hideAdminLoader();
-        }, 5000);
+        }, 800);
     }
 
     function updateAdminLoader(statusText, progressPercent) {
@@ -426,6 +433,9 @@ function initAdminConsole() {
             renderLiveProjectsTable(Array.isArray(cachedLiveProjects) ? cachedLiveProjects : []);
             renderEventsEditor(Array.isArray(cachedEvents) ? cachedEvents : []);
             renderApplicationsList(Array.isArray(cachedApplications) && cachedApplications.length > 0 ? cachedApplications : (localStore.applications || []));
+
+            // Instantly unblock dashboard & remove loading overlay (0ms UI latency)
+            hideAdminLoader();
 
             // Background sync from Supabase without blocking UI render
             if (window.GrandeurDB) {
@@ -1314,11 +1324,6 @@ function initAdminConsole() {
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        const maxDim = 300;
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > height) {
-                            if (width > maxDim) { height *= maxDim / width; width = maxDim; }
                         const maxDim = 350;
                         let width = img.width;
                         let height = img.height;
@@ -1535,21 +1540,11 @@ function initAdminConsole() {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const maxDim = 400;
+                    const maxDim = 250;
 
                     if (width > maxDim || height > maxDim) {
-                        if (width > height) {
-                            height = Math.round((height * maxDim) / width);
-                            width = maxDim;
-                        } else {
-                            width = Math.round((width * maxDim) / height);
-                            height = maxDim;
-                    const maxDim = 250;
-                    let width = img.width;
-                    let height = img.height;
-                    if (width > maxDim || height > maxDim) {
-                        if (width > height) { height *= maxDim / width; width = maxDim; }
-                        else { width *= maxDim / height; height = maxDim; }
+                        if (width > height) { height = Math.round((height * maxDim) / width); width = maxDim; }
+                        else { width = Math.round((width * maxDim) / height); height = maxDim; }
                     }
 
                     canvas.width = Math.round(width);
@@ -1958,7 +1953,7 @@ function initAdminConsole() {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const maxDim = 200;
+                    const maxDim = 250;
 
                     if (width > maxDim || height > maxDim) {
                         if (width > height) {
@@ -1968,14 +1963,6 @@ function initAdminConsole() {
                             width = Math.round((width * maxDim) / height);
                             height = maxDim;
                         }
-                    }
-
-                    const maxDim = 250;
-                    let width = img.width;
-                    let height = img.height;
-                    if (width > maxDim || height > maxDim) {
-                        if (width > height) { height *= maxDim / width; width = maxDim; }
-                        else { width *= maxDim / height; height = maxDim; }
                     }
 
                     canvas.width = Math.round(width);

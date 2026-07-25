@@ -19,7 +19,7 @@ const WRITE_HEADERS = {
     'Prefer': 'return=minimal'
 };
 
-const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes session & memory cache TTL
+const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours persistent cache TTL
 const gdbMemoryCache = new Map();
 
 function getSessionCachedData(key) {
@@ -31,13 +31,19 @@ function getSessionCachedData(key) {
             }
             gdbMemoryCache.delete(key);
         }
-        if (typeof window === 'undefined' || !window.sessionStorage) return null;
-        const raw = window.sessionStorage.getItem('gdb_cache_' + key);
-        if (!raw) return null;
-        const parsed = JSON.parse(raw);
-        if (Date.now() - parsed.timestamp < CACHE_TTL_MS) {
-            gdbMemoryCache.set(key, parsed);
-            return parsed.data;
+        if (typeof window !== 'undefined') {
+            const stores = [window.localStorage, window.sessionStorage];
+            for (const store of stores) {
+                if (!store) continue;
+                const raw = store.getItem('gdb_cache_' + key);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Date.now() - parsed.timestamp < CACHE_TTL_MS) {
+                        gdbMemoryCache.set(key, parsed);
+                        return parsed.data;
+                    }
+                }
+            }
         }
     } catch(e) {}
     return null;
@@ -45,12 +51,11 @@ function getSessionCachedData(key) {
 
 function setSessionCachedData(key, data) {
     try {
+        const item = JSON.stringify({ timestamp: Date.now(), data: data });
         gdbMemoryCache.set(key, { timestamp: Date.now(), data: data });
-        if (typeof window !== 'undefined' && window.sessionStorage) {
-            window.sessionStorage.setItem('gdb_cache_' + key, JSON.stringify({
-                timestamp: Date.now(),
-                data: data
-            }));
+        if (typeof window !== 'undefined') {
+            if (window.localStorage) window.localStorage.setItem('gdb_cache_' + key, item);
+            if (window.sessionStorage) window.sessionStorage.setItem('gdb_cache_' + key, item);
         }
     } catch(e) {}
 }
