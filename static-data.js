@@ -854,30 +854,35 @@ window.GRANDEUR_STATIC_DATA = {
     {
       "id": "lp_4",
       "title": "HDFC",
+      "logo": "collab-hdfc.png",
       "domain_tag": "Digital Channels & Insurance",
       "description": "Analysis of Adoption of Emerging Online Premium Collection Channels for HDFC Life Insurance Co. Ltd."
     },
     {
       "id": "lp_5",
       "title": "Yes Bank",
+      "logo": "collab-yesbank.png",
       "domain_tag": "Real Estate & Financial Feasibility",
       "description": "Conducted in depth feasibility & profitability analysis of an India-focused Real Estate Investment Trust."
     },
     {
       "id": "lp_6",
       "title": "Ken Research",
+      "logo": "collab-kenresearch.png",
       "domain_tag": "Retail Finance & Benchmarking",
       "description": "Conducted warehousing & retail finance analysis using statistical tools for competitive benchmarking."
     },
     {
       "id": "lp_7",
       "title": "Unstop",
+      "logo": "collab-unstop.png",
       "domain_tag": "Placement & Student Engagement",
       "description": "Planned to engage non-engineering students and strategized college placement drives."
     },
     {
       "id": "lp_8",
       "title": "Medulance",
+      "logo": "collab-medulance.png",
       "domain_tag": "B2B Expansion & GTM Strategy",
       "description": "Designed GTM strategies for new corporate services, planned B2B expansion, and built client databases."
     },
