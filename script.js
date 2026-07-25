@@ -808,7 +808,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (parsed && typeof parsed === 'object') {
                     if (parsed.description) description = parsed.description;
                     if (parsed.display_order !== undefined && parsed.display_order !== null) display_order = parsed.display_order;
-                    if (parsed.logo) logo = parsed.logo;
+                    if (parsed.logo && !parsed.logo.startsWith('data:image')) logo = parsed.logo;
                     if (parsed.members) members = parsed.members;
                     if (parsed.category_tier) category_tier = parsed.category_tier;
                 }
@@ -817,6 +817,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     members = item.team_name;
                 }
             }
+        }
+
+        if (logo && logo.startsWith('data:image')) {
+            logo = '';
         }
 
         if (!category_tier) {
@@ -887,7 +891,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ` : ''}
                     ${descValid ? `
                         <div class="achievement-desc-row">
-                            <span style="font-size:0.85rem; color:#d97706;">📝</span>
+                            <span style="font-size:0.9rem;">👥</span>
                             <span class="desc-text">${escapeHtml(meta.description)}</span>
                         </div>
                     ` : ''}
