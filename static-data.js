@@ -972,28 +972,25 @@ window.GRANDEUR_STATIC_DATA = {
       "id": "ranneeti",
       "title": "Ranneeti",
       "tagline": "Intra-College Direct PI Competition",
-      "description": "The premier strategy battleground designed to hone analytical thinking, GTM formulation, and presentation skills through live corporate case simulations and peer challenges.",
+      "description": "An exclusive strategy challenge for the incoming batch, designed to test analytical thinking, structured problem-solving, and business acumen, with outstanding participants securing direct PI spots for upcoming recruitments.",
       "slides": [
         {
-          "image": "",
-          "gradient": "gradient-ranneeti-1",
-          "badge": "Pre-Recruitment Event",
-          "title": "RANNEETI",
-          "sub": "Intra-College Strategy Battle"
+          "image": "ranneeti-1.jpg",
+          "badge": "",
+          "title": "",
+          "sub": ""
         },
         {
-          "image": "",
-          "gradient": "gradient-ranneeti-2",
-          "badge": "Pre-Recruitment Event",
-          "title": "Market Entry Pitch",
-          "sub": "Real-World Case Simulations"
+          "image": "ranneeti-2.png",
+          "badge": "",
+          "title": "",
+          "sub": ""
         },
         {
-          "image": "",
-          "gradient": "gradient-ranneeti-3",
-          "badge": "Pre-Recruitment Event",
-          "title": "1-on-1 Feedback",
-          "sub": "Guidance from Senior Consultants"
+          "image": "ranneeti-3.png",
+          "badge": "",
+          "title": "",
+          "sub": ""
         }
       ]
     }
