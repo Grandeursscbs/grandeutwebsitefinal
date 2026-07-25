@@ -90,7 +90,7 @@
                 </div>
 
                 <script>
-                    (async function loadLiveAlumni() {
+                        (async function loadLiveAlumni() {
                         const container = document.getElementById('dynamic-alumni-container');
                         if (!container) return;
 
@@ -101,12 +101,6 @@
                                     const fetched = await window.GrandeurDB.getAlumniMembers();
                                     if (Array.isArray(fetched) && fetched.length > 0) alumni = fetched;
                                 } catch(e) {}
-                            }
-                            );
-                                if (res.ok) {
-                                    const raw = await res.json();
-                                    alumni = (raw || []).filter(m => m.role && m.role.toLowerCase().includes('batch of'));
-                                }
                             }
 
                             if (Array.isArray(alumni) && alumni.length > 0) {
@@ -159,25 +153,19 @@
                                     }).join('');
 
                                     return `
-                                        <div class="hierarchy-section" style="margin-bottom: 3.5rem;">
-                                            <h4 class="tier-title" style="margin-bottom: 1.5rem;">${batchTitle}</h4>
-                                            <div class="team-grid tier-grid-1">
+                                        <div class="batch-section" style="margin-bottom: 3.5rem;">
+                                            <h3 style="color: var(--primary-light); font-size: 1.5rem; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(var(--primary-rgb), 0.1); text-align: left;">
+                                                ${batchTitle}
+                                            </h3>
+                                            <div class="grid grid-4">
                                                 ${cardsHtml}
                                             </div>
                                         </div>
                                     `;
                                 }).join('');
-                            } else {
-                                container.innerHTML = `
-                                    <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted); background: #ffffff; border: 1px dashed var(--border); border-radius: 16px; max-width: 600px; margin: 2rem auto;">
-                                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎓</div>
-                                        <h3 style="color: var(--dark); margin-bottom: 0.5rem;">No Alumni Members Listed Yet</h3>
-                                        <p style="font-size: 0.95rem;">Use the Grandeur Admin Console to add alumni members, batch years, and placements.</p>
-                                    </div>
-                                `;
                             }
                         } catch(e) {
-                            console.error("Error loading dynamic alumni:", e);
+                            console.error("Alumni load error:", e);
                         }
                     })();
                 </script>

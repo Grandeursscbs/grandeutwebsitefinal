@@ -100,7 +100,7 @@
                 </div>
 
                 <script>
-                    (async function loadLiveKnowledgeHub() {
+                        (async function loadLiveKnowledgeHub() {
                         const grid = document.getElementById('resources-list-grid');
                         if (!grid) return;
 
@@ -156,7 +156,6 @@
                             if (Array.isArray(data)) {
                                 allPrimers = sortPrimersByYearDesc(data);
                                 renderPrimersGrid(allPrimers);
-                            }
                             }
                         } catch(e) {
                             console.error("Knowledge Hub load error:", e);
