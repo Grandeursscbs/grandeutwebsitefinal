@@ -889,24 +889,28 @@ window.GRANDEUR_STATIC_DATA = {
     {
       "id": "lp_9",
       "title": "Meteor Ventures",
+      "logo": "collab-meteor.png",
       "domain_tag": "Strategic Partnerships & Marketing",
       "description": "Researched on Similar companies, managed strategic tie-ups and trackers, and led marketing."
     },
     {
       "id": "lp_10",
       "title": "Unmay",
+      "logo": "collab-unmay.png",
       "domain_tag": "Market Sizing & Competitor Analysis",
       "description": "Developed GTM, marketing, market sizing, and competitor analysis to expand Unmay’s business."
     },
     {
       "id": "lp_11",
       "title": "Catalyst IQ",
+      "logo": "collab-catalystiq.png",
       "domain_tag": "HR Tech Market Research",
       "description": "HR tech market research in India and globally, covering products, startups to guide investments."
     },
     {
       "id": "lp_12",
       "title": "Hobbeeme",
+      "logo": "collab-hobbeeme.png",
       "domain_tag": "Customer Acquisition & Vendor Growth",
       "description": "Developed customer acquisition, branding and vendor growth strategies for UAE-based hobby marketplace through research and analysis."
     }
