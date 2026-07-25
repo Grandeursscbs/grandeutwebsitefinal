@@ -2122,11 +2122,11 @@ a.resources-badge:hover {
 
 .lp-card-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
     margin-bottom: 1.25rem;
-    min-height: 54px;
+    min-height: 52px;
 }
 
 .lp-client-badge {
@@ -2182,29 +2182,34 @@ a.resources-badge:hover {
 
 .lp-domain-wrapper {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: flex-end;
     flex: 1;
     min-width: 0;
 }
 
 .lp-domain-tag {
-    font-size: 0.64rem;
-    font-weight: 700;
+    font-size: 0.65rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
-    padding: 0.35rem 0.65rem;
-    border-radius: 12px;
-    background: rgba(var(--primary-rgb, 30, 64, 175), 0.08);
-    color: var(--primary, #1e40af);
-    border: 1px solid rgba(var(--primary-rgb, 30, 64, 175), 0.15);
+    letter-spacing: 0.4px;
+    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    background: rgba(30, 64, 175, 0.06);
+    color: #1e40af;
+    border: 1px solid rgba(30, 64, 175, 0.15);
     white-space: normal;
     text-align: right;
-    line-height: 1.25;
+    line-height: 1.35;
+    overflow-wrap: break-word;
     word-break: break-word;
-    display: inline-block;
-    max-width: 180px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    max-width: 200px;
     box-sizing: border-box;
+    box-shadow: 0 1px 2px rgba(15, 29, 58, 0.03);
+    transition: all 0.2s ease;
 }
 
 .lp-card h3 {
