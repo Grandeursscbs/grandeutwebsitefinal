@@ -1018,7 +1018,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const html = projectsList.map(item => {
             const title = escapeHtml(item.title || item.client_name || '');
-            const domainTag = escapeHtml(item.domain_tag || 'Consulting');
+
             const description = escapeHtml(item.description || '');
 
             let logo = item.logo || item.client_logo || '';
@@ -1046,9 +1046,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="lp-client-badge">
                             ${avatarHtml}
                         </div>
-                        <div class="lp-domain-wrapper">
-                            <span class="lp-domain-tag" title="${domainTag}">${domainTag}</span>
-                        </div>
+
                     </div>
                     <h3>${title}</h3>
                     <p style="margin-bottom: 0;">${description}</p>
