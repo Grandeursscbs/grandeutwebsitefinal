@@ -119,6 +119,26 @@ a {
     background: transparent;
 }
 
+.sscbs-logo-img {
+    height: 44px;
+    width: auto;
+    object-fit: contain;
+    background: transparent;
+    transition: var(--transition);
+}
+
+.sscbs-logo-img:hover {
+    transform: scale(1.05);
+}
+
+.logo-divider {
+    height: 26px;
+    width: 1px;
+    background-color: rgba(0, 0, 0, 0.15);
+    margin: 0 0.1rem;
+    display: inline-block;
+}
+
 .footer-logo-img {
     height: 44px;
     width: auto;
@@ -1349,6 +1369,12 @@ body.menu-open {
     
     .logo-img {
         height: 36px;
+    }
+    .sscbs-logo-img {
+        height: 32px;
+    }
+    .logo-divider {
+        height: 20px;
     }
     
     .main-content {

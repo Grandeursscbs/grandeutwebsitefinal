@@ -435,6 +435,15 @@ window.GRANDEUR_STATIC_DATA = {
       "created_at": "2026-07-21T19:45:36.731545+00:00"
     },
     {
+      "id": "kritika-goel-2026",
+      "name": "Kritika Goel",
+      "role": "Batch of 2026 | Willis Towers Watson",
+      "tier": "board",
+      "photo": "kritika-goel.jpg",
+      "linkedin": "https://www.linkedin.com/in/kritika-goel-b4b873289/",
+      "created_at": "2026-08-01T16:44:00.000000+00:00"
+    },
+    {
       "id": "f89562bf-f85e-4e6c-b3c0-3c1111811abf",
       "name": "Maanika Bhardwaj",
       "role": "Batch of 2026 | AMROP",
