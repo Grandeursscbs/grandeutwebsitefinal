@@ -98,6 +98,12 @@ a {
     gap: 0.75rem;
 }
 
+.logo-container a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
 .logo-placeholder {
     width: 40px;
     height: 40px;
@@ -117,6 +123,11 @@ a {
     width: auto;
     object-fit: contain;
     background: transparent;
+    transition: var(--transition);
+}
+
+.logo-img:hover {
+    transform: scale(1.05);
 }
 
 .sscbs-logo-img {
