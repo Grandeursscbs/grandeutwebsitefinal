@@ -64,26 +64,21 @@ a {
     transition: var(--transition);
 }
 
-/* Announcement Banner */
+/* Announcement Banner - Ultra-Sleek Modern Design */
 .top-announcement-bar {
     position: relative;
     width: 100%;
     z-index: 1001;
-    background: linear-gradient(135deg, #071126 0%, #0f1d3a 40%, #172b54 100%);
+    background: linear-gradient(90deg, #050d1e 0%, #0d1e3d 40%, #162c56 70%, #050d1e 100%);
     color: #ffffff;
-    padding: 0.5rem 1rem;
-    font-size: 0.88rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+    padding: 0.35rem 1rem;
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
     box-sizing: border-box;
-}
-
-.top-announcement-bar.dismissed {
-    display: none !important;
+    overflow: hidden;
 }
 
 .announcement-container {
@@ -93,96 +88,108 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
 }
 
 .announcement-content {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
+    gap: 0.65rem;
     justify-content: center;
 }
 
 .announcement-badge {
-    background: linear-gradient(135deg, #d4af37, #f3e5ab);
-    color: #071126;
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 0.2rem 0.65rem;
+    background: linear-gradient(135deg, #d4af37 0%, #fef08a 100%);
+    color: #050d1e;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 0.15rem 0.6rem;
     border-radius: 50px;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     white-space: nowrap;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.35);
 }
 
 .announcement-text {
     color: #e2e8f0;
     font-weight: 500;
-    font-size: 0.88rem;
+    font-size: 0.84rem;
+    white-space: nowrap;
 }
 
 .announcement-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    background: linear-gradient(135deg, #d4af37 0%, #f3e5ab 100%);
-    color: #071126;
+    gap: 0.3rem;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    color: #fbc523;
     font-weight: 700;
-    font-size: 0.8rem;
-    padding: 0.3rem 0.85rem;
+    font-size: 0.78rem;
+    padding: 0.2rem 0.75rem;
     border-radius: 50px;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
     white-space: nowrap;
 }
 
 .announcement-btn:hover {
+    background: linear-gradient(135deg, #d4af37 0%, #fbc523 100%);
+    color: #050d1e;
+    border-color: #fbc523;
+    box-shadow: 0 0 12px rgba(251, 197, 35, 0.5);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.5);
-    color: #000000;
+}
+
+.announcement-arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.announcement-btn:hover .announcement-arrow {
+    transform: translateX(3px);
 }
 
 /* Adjust main content offset when announcement bar is active */
 body.has-announcement-bar .main-content {
-    margin-top: 125px;
+    margin-top: 115px;
 }
 
 @media (max-width: 1080px) {
     body.has-announcement-bar .main-content {
-        margin-top: 115px;
+        margin-top: 105px;
     }
 }
 
 @media (max-width: 768px) {
     .top-announcement-bar {
-        padding: 0.45rem 0.75rem;
+        padding: 0.3rem 0.5rem;
     }
-    .announcement-text {
-        font-size: 0.78rem;
-        text-align: center;
-        line-height: 1.35;
+    .announcement-content {
+        gap: 0.45rem;
     }
     .announcement-badge {
-        font-size: 0.65rem;
-        padding: 0.15rem 0.5rem;
+        font-size: 0.62rem;
+        padding: 0.12rem 0.45rem;
+    }
+    .announcement-text {
+        font-size: 0.76rem;
     }
     .announcement-btn {
-        padding: 0.25rem 0.65rem;
+        padding: 0.15rem 0.6rem;
         font-size: 0.72rem;
     }
     body.has-announcement-bar .main-content {
-        margin-top: 110px;
+        margin-top: 98px;
     }
 }
 
 @media (max-width: 520px) {
-    .announcement-text-extra {
+    .announcement-text-desktop {
         display: none;
     }
     body.has-announcement-bar .main-content {
-        margin-top: 105px;
+        margin-top: 92px;
     }
 }
 

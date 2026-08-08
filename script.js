@@ -1292,12 +1292,12 @@ document.addEventListener('DOMContentLoaded', () => {
         banner.innerHTML = `
             <div class="announcement-container">
                 <div class="announcement-content">
-                    <span class="announcement-badge">Annual Report 2025-26</span>
+                    <span class="announcement-badge">✨ Annual Report 2025-26</span>
                     <span class="announcement-text">
-                        Grandeur Annual Report 2025-26 is now live! <span class="announcement-text-extra">Explore our achievements, sector research &amp; corporate impact.</span>
+                        <span class="announcement-text-desktop">Grandeur Annual Report 2025-26 is live!</span>
                     </span>
                     <a href="${pdfUrl}" target="_blank" rel="noopener noreferrer" class="announcement-btn">
-                        Read Report &rarr;
+                        Read Report <span class="announcement-arrow">&rarr;</span>
                     </a>
                 </div>
             </div>
