@@ -139,7 +139,7 @@
                         </div>
                     </div>
                     <div class="ranneeti-urgency-banner">
-                        <span>⚡ Forms are live! Registrations close strictly on <strong>August 12th, 2026 at 11:59 PM IST (EOD)</strong>.</span>
+                        <span>⚡ Forms are live! Registrations close strictly on <strong>August 10th, 2026 at 11:59 PM IST (EOD)</strong>.</span>
                     </div>
                 </div>
             </div>
@@ -271,12 +271,28 @@
     <!-- Scripts -->
     <script src="script.js?v=26"></script>
     <script>
-        // Dedicated Ranneeti Countdown Timer Logic towards August 12th, 2026 23:59:59 IST
+        // Dynamic Auto-Extending Ranneeti Countdown Timer Logic
+        // Initial Deadline: Aug 10, 2026 23:59:59 IST
+        // Auto-Extension Trigger: Aug 10, 2026 23:00:00 IST (extends to Aug 12, 2026 23:59:59 IST)
         (function() {
-            const targetDate = new Date("2026-08-12T23:59:59+05:30").getTime();
+            const initialDeadline = new Date("2026-08-10T23:59:59+05:30").getTime();
+            const extensionTrigger = new Date("2026-08-10T23:00:00+05:30").getTime();
+            const finalDeadline = new Date("2026-08-12T23:59:59+05:30").getTime();
 
             function updateCountdown() {
                 const now = new Date().getTime();
+                let targetDate = initialDeadline;
+                const banner = document.querySelector(".ranneeti-urgency-banner");
+
+                // Auto-Extend deadline at 11 PM on Aug 10th
+                if (now >= extensionTrigger) {
+                    targetDate = finalDeadline;
+                    if (banner && !banner.dataset.extended) {
+                        banner.dataset.extended = "true";
+                        banner.innerHTML = "<span>🔥 REGISTRATION EXTENDED! Due to overwhelming demand, registrations will now close on <strong>August 12th, 2026 at 11:59 PM IST (EOD)</strong>.</span>";
+                    }
+                }
+
                 const difference = targetDate - now;
 
                 if (difference <= 0) {
@@ -284,7 +300,6 @@
                     document.getElementById("cd-hours").textContent = "00";
                     document.getElementById("cd-minutes").textContent = "00";
                     document.getElementById("cd-seconds").textContent = "00";
-                    const banner = document.querySelector(".ranneeti-urgency-banner");
                     if (banner) {
                         banner.innerHTML = "<span>🔴 Registrations for Ranneeti 10.0 are now closed. Thank you for your interest!</span>";
                         banner.style.background = "rgba(239, 68, 68, 0.25)";
