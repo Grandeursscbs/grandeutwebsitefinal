@@ -1298,7 +1298,7 @@ document.addEventListener('DOMContentLoaded', () => {
         banner.innerHTML = `
             <div class="announcement-container">
                 <div class="announcement-content">
-                    <span class="announcement-badge">&amp;nbsp;Annual Report 2025-26</span>
+                    <span class="announcement-badge">Annual Report 2025-26</span>
                     <span class="announcement-text">
                         Grandeur Annual Report 2025-26 is now live! <span class="announcement-text-extra">Explore our achievements, sector research &amp; corporate impact.</span>
                     </span>
@@ -1307,7 +1307,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </a>
                 </div>
                 <button class="announcement-close" id="announcement-close-btn" aria-label="Close notification">
-                    &amp;times;
+                    ✕
                 </button>
             </div>
         `;
