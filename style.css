@@ -1679,6 +1679,25 @@ body.menu-open {
         color: #0f1d3a !important;
     }
     
+    /* Mobile drawer Ranneeti link highlight */
+    .nav-links .nav-link-ranneeti {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+        padding: 0.65rem 1.25rem !important;
+        font-size: 1rem !important;
+        background: linear-gradient(135deg, rgba(251, 197, 35, 0.25) 0%, rgba(212, 175, 55, 0.45) 100%) !important;
+        border: 1px solid #fbc523 !important;
+        color: #ffffff !important;
+        border-radius: 50px !important;
+        box-shadow: 0 0 12px rgba(251, 197, 35, 0.35) !important;
+    }
+    
+    .nav-links .nav-link-ranneeti.active {
+        background: linear-gradient(135deg, #fbc523 0%, #d4af37 100%) !important;
+        color: #071126 !important;
+    }
+    
     .menu-toggle {
         display: flex;
     }
@@ -4103,39 +4122,104 @@ a.resources-badge:hover {
     color: var(--text-muted);
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments & Mobile Optimization */
 @media (max-width: 768px) {
     .ranneeti-hero {
-        padding: 3rem 1.25rem 2rem;
+        padding: 3rem 1rem 2rem;
+    }
+    .ranneeti-badge {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.85rem;
+        white-space: normal;
+        text-align: center;
+        line-height: 1.4;
     }
     .ranneeti-hero-title {
-        font-size: 2.5rem;
+        font-size: clamp(2.1rem, 7.5vw, 3rem);
     }
     .ranneeti-hero-subtitle {
         font-size: 1.1rem;
+    }
+    .ranneeti-hero-desc {
+        font-size: 0.95rem;
+        padding: 0 0.25rem;
+        margin-bottom: 1.75rem;
+    }
+    .ranneeti-countdown-wrapper {
+        padding: 1.5rem 0.85rem;
+        margin-bottom: 2rem;
+    }
+    .countdown-header-title {
+        font-size: 1.05rem;
+        letter-spacing: 0.8px;
     }
     .countdown-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem;
     }
+    .timer-card {
+        padding: 0.85rem 0.25rem;
+    }
     .timer-num {
-        font-size: 2rem;
+        font-size: 2.1rem;
+    }
+    .timer-unit {
+        font-size: 0.7rem;
     }
     .ranneeti-urgency-banner {
-        font-size: 0.8rem;
-        padding: 0.5rem 1rem;
+        font-size: 0.82rem;
+        padding: 0.55rem 0.85rem;
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+    .ranneeti-hero-cta {
+        flex-direction: column;
+        width: 100%;
+    }
+    .ranneeti-hero-cta .btn-gold,
+    .ranneeti-hero-cta .btn-outline {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+    .ranneeti-form-section {
+        padding: 2.5rem 1rem;
+    }
+    .form-embed-card {
+        padding: 0.5rem;
+        border-radius: 14px;
     }
     .ranneeti-form-iframe {
-        min-height: 1200px;
+        min-height: 950px;
+    }
+    .ranneeti-highlights-grid,
+    .ranneeti-gallery-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
     }
 }
 
 @media (max-width: 480px) {
-    .countdown-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .ranneeti-hero {
+        padding: 2.5rem 0.85rem 1.75rem;
     }
     .ranneeti-hero-title {
-        font-size: 2.1rem;
+        font-size: 1.95rem;
+    }
+    .countdown-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+    .timer-num {
+        font-size: 1.75rem;
+    }
+    .ranneeti-form-iframe {
+        min-height: 900px;
+    }
+    .form-fallback-container .btn {
+        width: 100%;
+        justify-content: center;
     }
 }
 
