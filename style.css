@@ -3838,13 +3838,11 @@ a.resources-badge:hover {
 
 /* Countdown Section */
 .ranneeti-countdown-wrapper {
-    background: rgba(15, 29, 58, 0.65);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(212, 175, 55, 0.4);
+    background: linear-gradient(135deg, #091224 0%, #0f1d3a 60%, #172b54 100%);
+    border: 1px solid rgba(212, 175, 55, 0.45);
     border-radius: var(--radius-lg);
     padding: 2.25rem 1.5rem;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    box-shadow: 0 15px 35px rgba(15, 29, 58, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
     margin-bottom: 2.5rem;
 }
 
@@ -3870,17 +3868,18 @@ a.resources-badge:hover {
 }
 
 .timer-card {
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%);
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    background: linear-gradient(145deg, #0f1d3a 0%, #1a2e56 100%);
+    border: 1px solid rgba(212, 175, 55, 0.35);
     border-radius: 16px;
     padding: 1.2rem 0.5rem;
     text-align: center;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .timer-card:hover {
     border-color: #fbc523;
+    box-shadow: 0 8px 25px rgba(251, 197, 35, 0.25);
     transform: translateY(-2px);
 }
 
@@ -3903,7 +3902,7 @@ a.resources-badge:hover {
 }
 
 .ranneeti-urgency-banner {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(212, 175, 55, 0.18));
+    background: linear-gradient(135deg, rgba(15, 29, 58, 0.9) 0%, rgba(23, 43, 84, 0.9) 100%);
     border: 1px dashed rgba(251, 197, 35, 0.55);
     border-radius: 50px;
     padding: 0.7rem 1.4rem;
