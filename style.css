@@ -1503,6 +1503,19 @@ body.menu-open {
 }
 
 @media (max-width: 1080px) {
+    .header {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        box-shadow: none !important;
+    }
+
+    .main-content,
+    body.has-announcement-bar .main-content {
+        margin-top: 0 !important;
+    }
+
     .nav-container {
         padding: 0.75rem 1.25rem;
     }
