@@ -1,4 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 0. Auto-Expiry & Deletion Handler for Ranneeti (Auto-hides links and redirects after Aug 13th 23:59:59 IST)
+    const RANNEETI_EXPIRY = new Date("2026-08-13T23:59:59+05:30").getTime();
+    if (Date.now() > RANNEETI_EXPIRY) {
+        document.querySelectorAll('.nav-link-ranneeti').forEach(el => {
+            const li = el.closest('li');
+            if (li) li.remove();
+        });
+        document.querySelectorAll('.footer-links a[href="ranneeti.html"]').forEach(el => {
+            const li = el.closest('li');
+            if (li) li.remove();
+        });
+        if (window.location.pathname.endsWith('ranneeti.html')) {
+            window.location.replace('index.html');
+        }
+    }
+
     // 1. Header scroll effect
     const header = document.querySelector('.header');
     if (header) {
