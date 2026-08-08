@@ -1511,9 +1511,12 @@ body.menu-open {
         box-shadow: none !important;
     }
 
-    .main-content,
+    .main-content {
+        margin-top: 70px !important;
+    }
+
     body.has-announcement-bar .main-content {
-        margin-top: 0 !important;
+        margin-top: 110px !important;
     }
 
     .nav-container {
