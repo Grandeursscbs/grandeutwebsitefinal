@@ -827,7 +827,7 @@ function initAdminConsole() {
                     </td>
                     <td>${escapeHtml(m.role)}</td>
                     <td><span class="tier-badge tier-${m.tier}">${escapeHtml(tierLabel)}</span></td>
-                    <td>${m.linkedin ? `<a href="${escapeHtml(m.linkedin)}" target="_blank" style="color:var(--admin-gold);">Profile ↗</a>` : '—'}</td>
+                    <td>${m.linkedin ? `<a href="${escapeHtml(m.linkedin)}" target="_blank" style="color:var(--admin-gold);">Profile ↗</a>` : '-'}</td>
                     <td>
                         <div class="action-btns-group">
                             <button class="btn-icon" onclick="editTeamMember('${m.id}')" title="Edit Member">✏️</button>
@@ -1039,7 +1039,7 @@ function initAdminConsole() {
                 <td><strong>${escapeHtml(item.title)}</strong></td>
                 <td><span class="tier-badge tier-core">${escapeHtml(item.category)}</span></td>
                 <td>${escapeHtml(item.date_label || item.year || '2026')}</td>
-                <td>${item.read_time ? escapeHtml(item.read_time) : '—'}</td>
+                <td>${item.read_time ? escapeHtml(item.read_time) : '-'}</td>
                 <td style="text-align: right;">
                     <div class="action-btns-group" style="justify-content: flex-end;">
                         ${item.pdf_url ? `<a href="${escapeHtml(item.pdf_url)}" target="_blank" class="btn-icon" title="Open Report" style="text-decoration:none;">🔗</a>` : ''}
@@ -1379,7 +1379,7 @@ function initAdminConsole() {
                         </div>
                     </td>
                     <td><span class="tier-badge tier-core">${escapeHtml(batch)}</span></td>
-                    <td>${escapeHtml(placement || '—')}</td>
+                    <td>${escapeHtml(placement || '-')}</td>
                     <td style="text-align: right;">
                         <div class="action-btns-group" style="justify-content: flex-end;">
                             ${item.linkedin ? `<a href="${escapeHtml(item.linkedin)}" target="_blank" class="btn-icon" title="LinkedIn" style="text-decoration:none;">🔗</a>` : ''}
@@ -1650,7 +1650,7 @@ function initAdminConsole() {
             const isFirst = idx === 0;
             const isLast = idx === sorted.length - 1;
 
-            const detailText = meta.members ? `👥 ${meta.members}${meta.description ? ' | ' + meta.description : ''}` : (meta.description || '—');
+            const detailText = meta.members ? `👥 ${meta.members}${meta.description ? ' | ' + meta.description : ''}` : (meta.description || '-');
 
             return `
                 <tr>
