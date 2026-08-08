@@ -1265,6 +1265,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initEventCarousels();
 
+    // Annual Report Top Notification Banner Logic
+    function initAnnualReportBanner() {
+        const expiryDate = new Date('2026-08-31T23:59:59+05:30');
+        const now = new Date();
+
+        // 1. Expiry Check: If current date is past 31st August 2026 EOD, return
+        if (now > expiryDate) {
+            return;
+        }
+
+        // 2. User Dismissal Check
+        const DISMISS_KEY = 'grandeur_annual_report_dismissed_2025_26';
+        if (localStorage.getItem(DISMISS_KEY) === 'true') {
+            return;
+        }
+
+        // 3. Avoid duplicate injection
+        if (document.getElementById('top-announcement-bar')) {
+            return;
+        }
+
+        // 4. Create and inject banner
+        const banner = document.createElement('div');
+        banner.id = 'top-announcement-bar';
+        banner.className = 'top-announcement-bar';
+        banner.setAttribute('role', 'region');
+        banner.setAttribute('aria-label', 'Announcement Banner');
+
+        const pdfUrl = 'Grandeur-Annual-Report-2025-26.pdf';
+
+        banner.innerHTML = `
+            <div class="announcement-container">
+                <div class="announcement-content">
+                    <span class="announcement-badge">&amp;nbsp;Annual Report 2025-26</span>
+                    <span class="announcement-text">
+                        Grandeur Annual Report 2025-26 is now live! <span class="announcement-text-extra">Explore our achievements, sector research &amp; corporate impact.</span>
+                    </span>
+                    <a href="${pdfUrl}" target="_blank" rel="noopener noreferrer" class="announcement-btn">
+                        Read Report &rarr;
+                    </a>
+                </div>
+                <button class="announcement-close" id="announcement-close-btn" aria-label="Close notification">
+                    &amp;times;
+                </button>
+            </div>
+        `;
+
+        document.body.prepend(banner);
+        document.body.classList.add('has-announcement-bar');
+
+        const closeBtn = document.getElementById('announcement-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                banner.classList.add('dismissed');
+                document.body.classList.remove('has-announcement-bar');
+                localStorage.setItem(DISMISS_KEY, 'true');
+            });
+        }
+    }
+
+    initAnnualReportBanner();
+
     // Execute sync
     syncGrandeurCMS();
     window.addEventListener('grandeur_store_updated', syncGrandeurCMS);

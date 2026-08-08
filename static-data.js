@@ -473,6 +473,15 @@ window.GRANDEUR_STATIC_DATA = {
       "created_at": "2026-07-19T20:06:37.731661+00:00"
     },
     {
+      "id": "grandeur-annual-report-2025-26",
+      "title": "Grandeur Annual Report 2025-26",
+      "category": "Annual Report",
+      "date_label": "2025-26",
+      "read_time": "Comprehensive annual publication summarizing Grandeur's consulting engagements, research publications, corporate partnerships, campus initiatives, and cell achievements for 2025-26.",
+      "pdf_url": "Grandeur-Annual-Report-2025-26.pdf",
+      "created_at": "2026-08-08T21:00:00.000000+00:00"
+    },
+    {
       "id": "09e4f4d6-f9ac-4499-903d-fc8b5ac8230a",
       "title": "AI in Healthcare",
       "category": "Industry Research Report",
