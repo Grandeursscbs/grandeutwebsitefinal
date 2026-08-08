@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 0. Auto-Expiry & Deletion Handler for Ranneeti (Auto-hides links and redirects after Aug 13th 23:59:59 IST)
-    const RANNEETI_EXPIRY = new Date("2026-08-13T23:59:59+05:30").getTime();
+    // 0. Auto-Expiry & Deletion Handler for Ranneeti (Auto-hides links and redirects after Aug 12th 23:59:59 IST)
+    const RANNEETI_EXPIRY = new Date("2026-08-12T23:59:59+05:30").getTime();
     if (Date.now() > RANNEETI_EXPIRY) {
         document.querySelectorAll('.nav-link-ranneeti').forEach(el => {
             const li = el.closest('li');
