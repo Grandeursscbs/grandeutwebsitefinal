@@ -66,9 +66,7 @@ a {
 
 /* Announcement Banner */
 .top-announcement-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
+    position: relative;
     width: 100%;
     z-index: 1001;
     background: linear-gradient(135deg, #071126 0%, #0f1d3a 40%, #172b54 100%);
@@ -146,41 +144,25 @@ a {
     color: #000000;
 }
 
-.announcement-close {
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 1.1rem;
-    cursor: pointer;
-    padding: 0.25rem 0.5rem;
-    line-height: 1;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.announcement-close:hover {
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.15);
-}
-
-/* Adjust header and main content when announcement bar is active */
-body.has-announcement-bar .header {
-    top: 42px;
-}
-
+/* Adjust main content offset when announcement bar is active */
 body.has-announcement-bar .main-content {
-    margin-top: 122px;
+    margin-top: 125px;
+}
+
+@media (max-width: 1080px) {
+    body.has-announcement-bar .main-content {
+        margin-top: 115px;
+    }
 }
 
 @media (max-width: 768px) {
     .top-announcement-bar {
-        padding: 0.4rem 0.75rem;
+        padding: 0.45rem 0.75rem;
     }
     .announcement-text {
         font-size: 0.78rem;
+        text-align: center;
+        line-height: 1.35;
     }
     .announcement-badge {
         font-size: 0.65rem;
@@ -190,11 +172,8 @@ body.has-announcement-bar .main-content {
         padding: 0.25rem 0.65rem;
         font-size: 0.72rem;
     }
-    body.has-announcement-bar .header {
-        top: 46px;
-    }
     body.has-announcement-bar .main-content {
-        margin-top: 126px;
+        margin-top: 110px;
     }
 }
 
@@ -202,11 +181,8 @@ body.has-announcement-bar .main-content {
     .announcement-text-extra {
         display: none;
     }
-    body.has-announcement-bar .header {
-        top: 50px;
-    }
     body.has-announcement-bar .main-content {
-        margin-top: 130px;
+        margin-top: 105px;
     }
 }
 

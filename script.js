@@ -1303,7 +1303,12 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        document.body.prepend(banner);
+        const header = document.querySelector('.header');
+        if (header) {
+            header.prepend(banner);
+        } else {
+            document.body.prepend(banner);
+        }
         document.body.classList.add('has-announcement-bar');
     }
 
