@@ -4124,8 +4124,35 @@ a.resources-badge:hover {
 
 /* Responsive adjustments & Mobile Optimization */
 @media (max-width: 768px) {
+    .top-announcement-bar {
+        padding: 0.4rem 0.75rem;
+    }
+    .announcement-container {
+        gap: 0.45rem;
+    }
+    .announcement-text {
+        font-size: 0.78rem;
+        text-align: center;
+        line-height: 1.35;
+    }
+    .announcement-badge {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.55rem;
+    }
+    .announcement-btn {
+        padding: 0.25rem 0.7rem;
+        font-size: 0.74rem;
+        min-height: 32px;
+    }
+    body.has-announcement-bar .header {
+        top: 44px;
+    }
+    body.has-announcement-bar .main-content {
+        margin-top: 124px;
+    }
+
     .ranneeti-hero {
-        padding: 3rem 1rem 2rem;
+        padding: 3.25rem 1rem 2.25rem;
     }
     .ranneeti-badge {
         font-size: 0.75rem;
@@ -4133,6 +4160,7 @@ a.resources-badge:hover {
         white-space: normal;
         text-align: center;
         line-height: 1.4;
+        max-width: 100%;
     }
     .ranneeti-hero-title {
         font-size: clamp(2.1rem, 7.5vw, 3rem);
@@ -4154,17 +4182,20 @@ a.resources-badge:hover {
         letter-spacing: 0.8px;
     }
     .countdown-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+        max-width: 100%;
     }
     .timer-card {
-        padding: 0.85rem 0.25rem;
+        padding: 0.85rem 0.2rem;
+        border-radius: 12px;
     }
     .timer-num {
-        font-size: 2.1rem;
+        font-size: 1.8rem;
     }
     .timer-unit {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
+        letter-spacing: 1px;
     }
     .ranneeti-urgency-banner {
         font-size: 0.82rem;
@@ -4172,16 +4203,21 @@ a.resources-badge:hover {
         width: 100%;
         justify-content: center;
         text-align: center;
+        box-sizing: border-box;
     }
     .ranneeti-hero-cta {
         flex-direction: column;
         width: 100%;
+        gap: 0.75rem;
     }
     .ranneeti-hero-cta .btn-gold,
     .ranneeti-hero-cta .btn-outline {
         width: 100%;
         justify-content: center;
         text-align: center;
+        box-sizing: border-box;
+        padding: 0.85rem 1.25rem;
+        font-size: 0.98rem;
     }
     .ranneeti-form-section {
         padding: 2.5rem 1rem;
@@ -4189,6 +4225,7 @@ a.resources-badge:hover {
     .form-embed-card {
         padding: 0.5rem;
         border-radius: 14px;
+        -webkit-overflow-scrolling: touch;
     }
     .ranneeti-form-iframe {
         min-height: 950px;
@@ -4200,19 +4237,35 @@ a.resources-badge:hover {
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 520px) {
+    .announcement-text-extra {
+        display: none;
+    }
+    body.has-announcement-bar .header {
+        top: 48px;
+    }
+    body.has-announcement-bar .main-content {
+        margin-top: 128px;
+    }
     .ranneeti-hero {
         padding: 2.5rem 0.85rem 1.75rem;
     }
     .ranneeti-hero-title {
-        font-size: 1.95rem;
+        font-size: 2rem;
     }
     .countdown-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.5rem;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.35rem;
+    }
+    .timer-card {
+        padding: 0.75rem 0.15rem;
     }
     .timer-num {
-        font-size: 1.75rem;
+        font-size: 1.55rem;
+    }
+    .timer-unit {
+        font-size: 0.6rem;
+        letter-spacing: 0.5px;
     }
     .ranneeti-form-iframe {
         min-height: 900px;
@@ -4220,6 +4273,28 @@ a.resources-badge:hover {
     .form-fallback-container .btn {
         width: 100%;
         justify-content: center;
+    }
+}
+
+@media (max-width: 380px) {
+    .top-announcement-bar {
+        padding: 0.35rem 0.5rem;
+    }
+    .announcement-badge {
+        font-size: 0.6rem;
+        padding: 0.1rem 0.4rem;
+    }
+    .announcement-text {
+        font-size: 0.72rem;
+    }
+    body.has-announcement-bar .header {
+        top: 42px;
+    }
+    body.has-announcement-bar .main-content {
+        margin-top: 122px;
+    }
+    .timer-num {
+        font-size: 1.4rem;
     }
 }
 
