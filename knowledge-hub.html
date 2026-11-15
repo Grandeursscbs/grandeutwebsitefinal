@@ -104,6 +104,23 @@
 
                 <div class="grid grid-3" id="resources-list-grid">
 
+            <div class="resource-card-item" data-category="Industry Research Report">
+                <div class="resource-card">
+                    <div class="resource-meta">
+                        <span class="resource-tag">Industry Research Report</span>
+                        <span class="resource-type">November 2026</span>
+                    </div>
+                    <h3>Ethanol Blending Crisis in India</h3>
+                    <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;">A comprehensive joint report with MHCF evaluating India's Ethanol Blending Programme: E20 transition, capacity glut, maize feedstock economics, vehicle compatibility, and policy trade-offs.</p>
+                    <div class="resource-footer" style="justify-content: flex-end;">
+                        <a href="Ethanol-Blending-Crisis-In-India-2026.pdf"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="resource-link">Read Here →</a>
+                    </div>
+                </div>
+            </div>
+
             <div class="resource-card-item" data-category="Annual Report">
                 <div class="resource-card" style="border: 1px solid rgba(212, 175, 55, 0.4); background: linear-gradient(180deg, #ffffff 0%, #fdfbf7 100%);">
                     <div class="resource-meta">
@@ -346,7 +363,11 @@
                                         const match = str.match(/\b(20\d\d|19\d\d)\b/);
                                         return match ? parseInt(match[1], 10) : 0;
                                     };
-                                    return extractYear(b) - extractYear(a);
+                                    const diff = extractYear(b) - extractYear(a);
+                                    if (diff !== 0) return diff;
+                                    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+                                    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+                                    return timeB - timeA;
                                 });
                                 grid.innerHTML = primers.map(p => {
                                     const cat = p.category || 'Industry Research Report';

@@ -114,6 +114,14 @@ window.GrandeurDB = {
     async getKnowledgePrimers() {
         const staticPrimers = (window.GRANDEUR_STATIC_DATA && window.GRANDEUR_STATIC_DATA.primers) || [];
         const list = getLocalStore('knowledge_primers', staticPrimers);
+        if (Array.isArray(list) && Array.isArray(staticPrimers)) {
+            const existingIds = new Set(list.map(p => String(p.id)));
+            const missing = staticPrimers.filter(p => !existingIds.has(String(p.id)));
+            if (missing.length > 0) {
+                const combined = [...missing, ...list];
+                return sortPrimersByYearDesc(combined);
+            }
+        }
         return sortPrimersByYearDesc(list);
     },
 
