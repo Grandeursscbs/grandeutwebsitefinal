@@ -466,8 +466,8 @@ window.GRANDEUR_STATIC_DATA = {
     {
       "id": "ethanol-blending-crisis-in-india-2026",
       "title": "Ethanol Blending Crisis in India",
-      "category": "Industry Research Report",
-      "date_label": "November 2026",
+      "category": "Crisis Report",
+      "date_label": "2026",
       "read_time": "A comprehensive joint report with MHCF evaluating India's Ethanol Blending Programme: E20 transition, capacity glut, maize feedstock economics, vehicle compatibility, and policy trade-offs.",
       "pdf_url": "Ethanol-Blending-Crisis-In-India-2026.pdf",
       "created_at": "2026-11-15T16:20:00.000000+00:00"

@@ -1270,12 +1270,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initEventCarousels();
 
-    // Annual Report Top Notification Banner Logic
-    function initAnnualReportBanner() {
-        const expiryDate = new Date('2026-08-31T23:59:59+05:30');
+    // Ethanol Blending Crisis Report Top Notification Banner Logic
+    function initEthanolReportBanner() {
+        const expiryDate = new Date('2026-11-30T23:59:59+05:30');
         const now = new Date();
 
-        // 1. Expiry Check: If current date is past 31st August 2026 EOD, return
+        // 1. Expiry Check: If current date is past 30th November 2026 EOD, return
         if (now > expiryDate) {
             return;
         }
@@ -1292,14 +1292,15 @@ document.addEventListener('DOMContentLoaded', () => {
         banner.setAttribute('role', 'region');
         banner.setAttribute('aria-label', 'Announcement Banner');
 
-        const pdfUrl = 'Grandeur-Annual-Report-2025-26.pdf';
+        const pdfUrl = 'Ethanol-Blending-Crisis-In-India-2026.pdf';
 
         banner.innerHTML = `
             <div class="announcement-container">
                 <div class="announcement-content">
-                    <span class="announcement-badge">✨ Annual Report 2025-26</span>
+                    <span class="announcement-badge">⚡ Crisis Report</span>
                     <span class="announcement-text">
-                        <span class="announcement-text-desktop">Grandeur Annual Report 2025-26 is live!</span>
+                        <span class="announcement-text-desktop">Ethanol Blending Crisis in India: Challenges, Policy Trade-offs & Future Outlook</span>
+                        <span class="announcement-text-mobile">Ethanol Blending Crisis Report is out!</span>
                     </span>
                     <a href="${pdfUrl}" target="_blank" rel="noopener noreferrer" class="announcement-btn">
                         Read Report <span class="announcement-arrow">&rarr;</span>
@@ -1317,7 +1318,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('has-announcement-bar');
     }
 
-    initAnnualReportBanner();
+    initEthanolReportBanner();
 
     // Execute sync
     syncGrandeurCMS();

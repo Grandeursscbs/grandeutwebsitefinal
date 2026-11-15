@@ -69,11 +69,11 @@ a {
     position: relative;
     width: 100%;
     z-index: 1001;
-    background: linear-gradient(90deg, #050d1e 0%, #0d1e3d 40%, #162c56 70%, #050d1e 100%);
+    background: linear-gradient(90deg, #051326 0%, #0c2340 35%, #133965 70%, #051326 100%);
     color: #ffffff;
     padding: 0.35rem 1rem;
     font-size: 0.85rem;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    border-bottom: 1px solid rgba(56, 189, 248, 0.35);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -98,8 +98,8 @@ a {
 }
 
 .announcement-badge {
-    background: linear-gradient(135deg, #d4af37 0%, #fef08a 100%);
-    color: #050d1e;
+    background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+    color: #03152e;
     font-size: 0.68rem;
     font-weight: 800;
     padding: 0.15rem 0.6rem;
@@ -107,7 +107,7 @@ a {
     letter-spacing: 0.5px;
     text-transform: uppercase;
     white-space: nowrap;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.35);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
 }
 
 .announcement-text {
@@ -117,13 +117,17 @@ a {
     white-space: nowrap;
 }
 
+.announcement-text-mobile {
+    display: none;
+}
+
 .announcement-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    background: rgba(212, 175, 55, 0.15);
-    border: 1px solid rgba(212, 175, 55, 0.5);
-    color: #fbc523;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.5);
+    color: #38bdf8;
     font-weight: 700;
     font-size: 0.78rem;
     padding: 0.2rem 0.75rem;
@@ -134,10 +138,10 @@ a {
 }
 
 .announcement-btn:hover {
-    background: linear-gradient(135deg, #d4af37 0%, #fbc523 100%);
-    color: #050d1e;
-    border-color: #fbc523;
-    box-shadow: 0 0 12px rgba(251, 197, 35, 0.5);
+    background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+    color: #03152e;
+    border-color: #38bdf8;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
     transform: translateY(-1px);
 }
 
@@ -187,6 +191,9 @@ body.has-announcement-bar .main-content {
 @media (max-width: 520px) {
     .announcement-text-desktop {
         display: none;
+    }
+    .announcement-text-mobile {
+        display: inline;
     }
     body.has-announcement-bar .main-content {
         margin-top: 92px;
